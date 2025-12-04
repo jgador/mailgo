@@ -148,7 +148,7 @@ No tracking of clicks or opens in v1.
 
 ## 6. Data model (v1)
 
-Entity names in `EmailMarketing.Domain` project.
+Entity names in `Mailgo.Domain` project.
 
 1. **Recipient**
    - `Id` (Guid)

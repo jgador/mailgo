@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailMarketing.Domain", "EmailMarketing.Domain\EmailMarketing.Domain.csproj", "{DDB32C62-4BD9-4A75-91D2-5566F5258E06}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailgo.Domain", "src\\Mailgo.Domain\\Mailgo.Domain.csproj", "{DDB32C62-4BD9-4A75-91D2-5566F5258E06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailMarketing.Api", "EmailMarketing.Api\EmailMarketing.Api.csproj", "{07078B44-906E-42CE-BDB3-7C3EB63CAC37}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailgo.Api", "src\\Mailgo.Api\\Mailgo.Api.csproj", "{07078B44-906E-42CE-BDB3-7C3EB63CAC37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

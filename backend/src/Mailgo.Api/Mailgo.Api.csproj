@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EmailMarketing.Domain\EmailMarketing.Domain.csproj" />
+    <ProjectReference Include="..\Mailgo.Domain\Mailgo.Domain.csproj" />
   </ItemGroup>
 
 </Project>

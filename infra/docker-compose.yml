@@ -1,8 +1,8 @@
 services:
   api:
     build:
-      context: .
-      dockerfile: EmailMarketing.Api/Dockerfile
+      context: ../backend
+      dockerfile: docker/api.Dockerfile
     environment:
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Default: Data Source=/data/app.db
@@ -10,14 +10,14 @@ services:
       Smtp__DefaultPort: ${SMTP_DEFAULT_PORT:-587}
       Smtp__DefaultUseStartTls: ${SMTP_DEFAULT_USE_STARTTLS:-true}
     volumes:
-      - ./data:/data
+      - ../data:/data
     ports:
       - "5000:8080"
 
   web:
     build:
-      context: .
-      dockerfile: gemini/Dockerfile
+      context: ../frontend
+      dockerfile: docker/web.Dockerfile
       args:
         REACT_APP_API_BASE_URL: /api
     depends_on:
