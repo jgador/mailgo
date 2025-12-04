@@ -26,7 +26,7 @@ dotnet build Mailgo.sln
 dotnet run --project src/Mailgo.Api/Mailgo.Api.csproj
 ```
 
-The API listens on `http://localhost:5000` by default (configure via `ConnectionStrings__Default` and the `ASPNETCORE_URLS` environment variables). Provide SMTP defaults with `Smtp__DefaultHost`, `Smtp__DefaultPort`, and related env vars.
+The API listens on `http://localhost:5000` by default (configure via `ConnectionStrings__Default` and the `ASPNETCORE_URLS` environment variables). SMTP host/credential details are provided per send from the frontend, so nothing is stored in `appsettings` or environment variables.
 
 ## Running the frontend locally
 
@@ -37,7 +37,7 @@ REACT_APP_API_BASE_URL=http://localhost:5000/api npm start
 ```
 
 `npm start` launches the React dev server on `http://localhost:3000`. Persist settings in `frontend/app/.env.local` (keys must stay prefixed with `REACT_APP_`) instead of exporting them every time.
-Use the `Settings ▸ Sender Setup` page inside the dashboard to capture SMTP host, port, encryption, and “from” overrides—those values are stored in your browser and pre-fill the send dialogs, but passwords are still provided at send time.
+Use the `Settings → Sender Setup` page inside the dashboard to capture SMTP host, port, encryption, and “from” overrides—those values are stored in your browser and pre-fill the send dialogs, but passwords are still provided per test/send.
 
 ## Docker Compose
 
@@ -49,7 +49,7 @@ docker compose up --build
 - `api` (ASP.NET Core) listens on `localhost:5000`
 - `web` (CRA build served via Nginx) listens on `localhost:3000` and proxies `/api` to the API container
 
-SQLite data is persisted in `../data` relative to `infra/`. Customize SMTP defaults via `SMTP_DEFAULT_*` env vars in `.env` or the shell.
+SQLite data is persisted in `../data` relative to `infra/`. SMTP details are supplied entirely through the UI at send time, so there are no SMTP-specific environment variables.
 
 ## Key Features
 

@@ -303,7 +303,7 @@ Built using create react app with TypeScript template.
 - Use simple CSS or CSS modules. No Tailwind or component library required for v1.
 - Use `fetch` or `axios` for API calls.
 - All API base URLs configured via environment variable so that Nginx or CRA proxy can route to `api` service inside Docker.
-- SMTP host and port fields in the dialog can be prefilled from environment values but password is always blank.
+- SMTP host and port fields in the dialog should load from local, browser-side storage configured via a Sender Setup screen; nothing is persisted on the server.
 
 ---
 
@@ -317,11 +317,7 @@ Services:
    - Built from ASP.NET Core project.
    - Environment variables:
      - `ConnectionStrings__Default` pointing to `/data/app.db`.
-     - Optional defaults:
-       - `Smtp__DefaultHost`
-       - `Smtp__DefaultPort`
-       - `Smtp__DefaultUseSsl` or `Smtp__DefaultUseStartTls`.
-   - Must not contain username or password in environment for v1.
+   - Receives SMTP host/port/credentials only with each send/test request—no SMTP data lives in configuration or environment variables.
    - Volume:
      - `./data` mapped to `/data` to persist SQLite file.
 

@@ -16,4 +16,4 @@ Services:
 - `api` — builds from `backend/` using `backend/docker/api.Dockerfile`
 - `web` — builds from `frontend/` using `frontend/docker/web.Dockerfile`
 
-SQLite data is mounted from `../data` so it survives container rebuilds. Override SMTP defaults with `SMTP_DEFAULT_*` env vars or an `.env` file next to `docker-compose.yml`.
+SQLite data is mounted from `../data` so it survives container rebuilds. SMTP credentials/hosts are entered through the dashboard’s Sender Setup flow and never reside in container environment variables.

@@ -6,9 +6,6 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Default: Data Source=/data/app.db
-      Smtp__DefaultHost: ${SMTP_DEFAULT_HOST:-}
-      Smtp__DefaultPort: ${SMTP_DEFAULT_PORT:-587}
-      Smtp__DefaultUseStartTls: ${SMTP_DEFAULT_USE_STARTTLS:-true}
     volumes:
       - ../data:/data
     ports:

@@ -18,7 +18,7 @@ dotnet restore Mailgo.sln
 dotnet run --project src/Mailgo.Api/Mailgo.Api.csproj
 ```
 
-Set `ConnectionStrings__Default` and `Smtp__*` env vars to override SQLite path or SMTP defaults. The API listens on `http://localhost:5000` unless `ASPNETCORE_URLS` is set.
+Set `ConnectionStrings__Default` to change the SQLite location (or point to another provider) and optionally override `ASPNETCORE_URLS`. SMTP information is never read from configuration—the API expects each send/test call to provide host/credential details.
 
 ## Docker Build
 
