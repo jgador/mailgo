@@ -19,11 +19,25 @@ public class SmtpSettingsRequest
     [Required]
     public EncryptionType Encryption { get; set; } = EncryptionType.StartTls;
 
+    public string? EncryptionHostname { get; set; }
+
+    public bool AllowSelfSigned { get; set; }
+
+    [MaxLength(256)]
+    public string? OverrideFromName { get; set; }
+
+    [EmailAddress, MaxLength(256)]
+    public string? OverrideFromAddress { get; set; }
+
     public SmtpSettings ToSettings() =>
         new(
             SmtpHost,
             SmtpPort,
             string.IsNullOrWhiteSpace(SmtpUsername) ? null : SmtpUsername,
             string.IsNullOrWhiteSpace(SmtpPassword) ? null : SmtpPassword,
-            Encryption);
+            Encryption,
+            string.IsNullOrWhiteSpace(EncryptionHostname) ? null : EncryptionHostname,
+            AllowSelfSigned,
+            string.IsNullOrWhiteSpace(OverrideFromName) ? null : OverrideFromName,
+            string.IsNullOrWhiteSpace(OverrideFromAddress) ? null : OverrideFromAddress);
 }

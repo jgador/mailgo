@@ -7,4 +7,8 @@ public record SmtpSettings(
     int Port,
     string? Username,
     string? Password,
-    EncryptionType Encryption);
+    EncryptionType Encryption,
+    string? EncryptionHostname,
+    bool AllowSelfSignedCertificates,
+    string? OverrideFromName,
+    string? OverrideFromAddress);

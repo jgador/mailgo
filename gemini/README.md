@@ -16,4 +16,6 @@ View your app in AI Studio: https://ai.studio/apps/temp/2
 2. Configure API/SMTP defaults in [.env.local](.env.local) (e.g. `REACT_APP_API_BASE_URL=http://localhost:5000/api`)
 3. Start the CRA dev server: `npm start`
 
+Each send/test dialog lets you configure SMTP host, port, encryption mode, optional TLS hostname, acceptance of self-signed certificates, and optional From overrides. These values are not persisted; populate defaults via `.env.local` if desired.
+
 For a production build, run `npm run build` (output is written to `build/`).

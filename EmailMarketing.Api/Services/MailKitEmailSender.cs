@@ -1,3 +1,5 @@
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using EmailMarketing.Api.Enums;
 using EmailMarketing.Domain.Entities;
 using MailKit.Net.Smtp;
@@ -17,8 +19,15 @@ public class MailKitEmailSender : IEmailSender
     {
         var toAddress = overrideRecipientEmail ?? recipient.Email;
 
+        var fromName = string.IsNullOrWhiteSpace(settings.OverrideFromName)
+            ? campaign.FromName
+            : settings.OverrideFromName;
+        var fromAddress = string.IsNullOrWhiteSpace(settings.OverrideFromAddress)
+            ? campaign.FromEmail
+            : settings.OverrideFromAddress;
+
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(campaign.FromName, campaign.FromEmail));
+        message.From.Add(new MailboxAddress(fromName, fromAddress));
         message.To.Add(MailboxAddress.Parse(toAddress));
         message.Subject = campaign.Subject;
 
@@ -30,6 +39,29 @@ public class MailKitEmailSender : IEmailSender
         message.Body = bodyBuilder.ToMessageBody();
 
         using var client = new SmtpClient();
+        if (settings.AllowSelfSignedCertificates || !string.IsNullOrWhiteSpace(settings.EncryptionHostname))
+        {
+            client.ServerCertificateValidationCallback = (_, certificate, _, errors) =>
+            {
+                if (settings.AllowSelfSignedCertificates)
+                {
+                    return true;
+                }
+
+                if (!string.IsNullOrWhiteSpace(settings.EncryptionHostname) && certificate is X509Certificate2 cert)
+                {
+                    var dnsName = cert.GetNameInfo(X509NameType.DnsName, false);
+                    if (!string.IsNullOrWhiteSpace(dnsName) &&
+                        dnsName.Equals(settings.EncryptionHostname, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+
+                return errors == SslPolicyErrors.None;
+            };
+        }
+
         var secureOption = settings.Encryption switch
         {
             EncryptionType.SSL => SecureSocketOptions.SslOnConnect,

@@ -42,6 +42,6 @@ SQLite data is persisted in `./data` on the host. Customize SMTP defaults via `S
 
 - Recipient CSV ingestion with validation/deduplication (stored in SQLite)
 - Campaign CRUD lifecycle (Draft → Sending → Completed/Failed) with live status
-- SMTP test sends + production sends with per-send credentials stored only in memory
+- SMTP test sends + production sends with per-send credentials (host, port, encryption/SNI hostname, self-signed toggle, from overrides) stored only in memory
 - Background worker that batches SMTP deliveries and records per-recipient logs
 - React dashboard covering dashboard stats, recipient management, campaign editing, previewing, and log inspection

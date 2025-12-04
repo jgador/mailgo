@@ -59,6 +59,10 @@ export interface SmtpSettings {
   smtpUsername?: string;
   smtpPassword?: string;
   encryption: EncryptionType;
+  encryptionHostname?: string;
+  allowSelfSigned?: boolean;
+  overrideFromName?: string;
+  overrideFromAddress?: string;
 }
 
 export interface SendTestRequest extends SmtpSettings {
