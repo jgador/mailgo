@@ -15,6 +15,8 @@ public class CampaignSenderService(
     IEmailSender emailSender) : BackgroundService
 {
     private const int BatchSize = 20;
+    private static readonly TimeSpan IdlePollInterval = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan ActivePollInterval = TimeSpan.FromSeconds(1);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -32,7 +34,7 @@ public class CampaignSenderService(
 
                 if (campaign is null)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+                    await Task.Delay(IdlePollInterval, stoppingToken);
                     continue;
                 }
 
@@ -49,7 +51,7 @@ public class CampaignSenderService(
 
                 if (!completed)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                    await Task.Delay(ActivePollInterval, stoppingToken);
                 }
             }
             catch (OperationCanceledException)
