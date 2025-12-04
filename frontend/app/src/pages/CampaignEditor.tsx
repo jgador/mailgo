@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { campaignService } from '../services/api';
-import { Campaign, CampaignStatus, CreateCampaignRequest, SendNowRequest, SendTestRequest } from '../types';
+import { CampaignStatus, CreateCampaignRequest, SendNowRequest, SendTestRequest } from '../types';
 import SmtpModal from '../components/SmtpModal';
 import { Save, Send, Eye, Monitor, ChevronLeft } from 'lucide-react';
 
 const CampaignEditor: React.FC = () => {
-  const { id } = useParams();
+  const { id: routeId } = useParams();
   const navigate = useNavigate();
-  const isEditMode = !!id;
+  const [campaignId, setCampaignId] = useState<string | null>(routeId ?? null);
+  const isEditMode = !!campaignId;
 
   const [formData, setFormData] = useState<CreateCampaignRequest>({
     name: '',
@@ -22,16 +23,23 @@ const CampaignEditor: React.FC = () => {
   const [campaignStatus, setCampaignStatus] = useState<CampaignStatus>(CampaignStatus.Draft);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [preparingAction, setPreparingAction] = useState<'test' | 'send' | null>(null);
   
   // Modal State
   const [showTestModal, setShowTestModal] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
 
   useEffect(() => {
-    if (isEditMode && id) {
-      loadCampaign(id);
+    if (routeId && routeId !== campaignId) {
+      setCampaignId(routeId);
     }
-  }, [id, isEditMode]);
+  }, [routeId, campaignId]);
+
+  useEffect(() => {
+    if (campaignId) {
+      loadCampaign(campaignId);
+    }
+  }, [campaignId]);
 
   const loadCampaign = async (campaignId: string) => {
     setLoading(true);
@@ -59,19 +67,49 @@ const CampaignEditor: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
+  const ensureRequiredFields = () => {
     if (!formData.name || !formData.subject || !formData.fromEmail) {
       alert('Please fill in required fields (Name, Subject, From Email)');
+      return false;
+    }
+    return true;
+  };
+
+  const ensureCampaignExists = async (): Promise<string | null> => {
+    if (campaignId) {
+      return campaignId;
+    }
+    if (!ensureRequiredFields()) {
+      return null;
+    }
+
+    setSaving(true);
+    try {
+      const newCampaign = await campaignService.create(formData);
+      setCampaignId(newCampaign.id);
+      setCampaignStatus(newCampaign.status);
+      navigate(`/campaigns/${newCampaign.id}`, { replace: true });
+      return newCampaign.id;
+    } catch (error) {
+      console.error('Failed to create campaign', error);
+      alert('Failed to create campaign.');
+      return null;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!ensureRequiredFields()) {
       return;
     }
 
     setSaving(true);
     try {
-      if (isEditMode && id) {
-        await campaignService.update(id, formData);
+      if (campaignId) {
+        await campaignService.update(campaignId, formData);
       } else {
-        const newCampaign = await campaignService.create(formData);
-        navigate(`/campaigns/${newCampaign.id}`, { replace: true });
+        await ensureCampaignExists();
       }
     } catch (error) {
       console.error('Failed to save', error);
@@ -82,13 +120,15 @@ const CampaignEditor: React.FC = () => {
   };
 
   const handleSendTest = async (settings: SendTestRequest | SendNowRequest) => {
-    if (!id || !('testEmail' in settings)) return;
-    await campaignService.sendTest(id, settings);
+    const currentId = await ensureCampaignExists();
+    if (!currentId || !('testEmail' in settings)) return;
+    await campaignService.sendTest(currentId, settings);
     alert('Test email sent successfully!');
   };
 
   const handleSendNow = async (settings: SendTestRequest | SendNowRequest) => {
-     if (!id) return;
+     const currentId = await ensureCampaignExists();
+     if (!currentId) return;
      const payload: SendNowRequest = {
         smtpHost: settings.smtpHost,
         smtpPort: settings.smtpPort,
@@ -96,9 +136,29 @@ const CampaignEditor: React.FC = () => {
         smtpPassword: settings.smtpPassword,
         encryption: settings.encryption,
      };
-     await campaignService.sendNow(id, payload);
+     await campaignService.sendNow(currentId, payload);
      alert('Campaign started successfully!');
-     navigate(`/campaigns/${id}`);
+     navigate(`/campaigns/${currentId}`);
+  };
+
+  const handleOpenTestModal = async () => {
+    if (isReadOnly) return;
+    setPreparingAction('test');
+    const ensuredId = await ensureCampaignExists();
+    if (ensuredId) {
+      setShowTestModal(true);
+    }
+    setPreparingAction(null);
+  };
+
+  const handleOpenSendModal = async () => {
+    if (isReadOnly) return;
+    setPreparingAction('send');
+    const ensuredId = await ensureCampaignExists();
+    if (ensuredId) {
+      setShowSendModal(true);
+    }
+    setPreparingAction(null);
   };
 
   // If not draft, we shouldn't be here really, unless viewing code. 
@@ -138,24 +198,24 @@ const CampaignEditor: React.FC = () => {
                 </button>
             )}
             
-            {isEditMode && (
+            {!isReadOnly && (
                 <>
                 <button
-                    onClick={() => setShowTestModal(true)}
-                    className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+                    onClick={handleOpenTestModal}
+                    className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50"
+                    disabled={preparingAction === 'test'}
                 >
                     <Eye size={18} />
-                    Send Test
+                    {preparingAction === 'test' ? 'Preparing...' : 'Send Test'}
                 </button>
-                {!isReadOnly && (
-                    <button
-                        onClick={() => setShowSendModal(true)}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-                    >
-                        <Send size={18} />
-                        Send Now
-                    </button>
-                )}
+                <button
+                    onClick={handleOpenSendModal}
+                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50"
+                    disabled={preparingAction === 'send'}
+                >
+                    <Send size={18} />
+                    {preparingAction === 'send' ? 'Preparing...' : 'Send Now'}
+                </button>
                 </>
             )}
         </div>

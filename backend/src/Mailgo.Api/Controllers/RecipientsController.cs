@@ -79,6 +79,16 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
 
         try
         {
+            if (config.HasHeaderRecord)
+            {
+                if (!await csv.ReadAsync())
+                {
+                    return BadRequest("CSV file is empty.");
+                }
+
+                csv.ReadHeader();
+            }
+
             while (await csv.ReadAsync())
             {
                 totalRows++;

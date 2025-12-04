@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { EncryptionType } from '../types';
 import {
   loadSmtpDefaults,
@@ -10,9 +11,13 @@ import {
 const SettingsPage: React.FC = () => {
   const [form, setForm] = useState<SmtpDefaults>(loadSmtpDefaults());
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     setForm(loadSmtpDefaults());
+    setPassword('');
+    setShowPassword(false);
   }, []);
 
   const handleChange = <K extends keyof SmtpDefaults>(key: K, value: SmtpDefaults[K]) => {
@@ -39,6 +44,8 @@ const SettingsPage: React.FC = () => {
     clearSmtpDefaults();
     const defaults = loadSmtpDefaults();
     setForm(defaults);
+    setPassword('');
+    setShowPassword(false);
     setStatus('idle');
   };
 
@@ -115,6 +122,33 @@ const SettingsPage: React.FC = () => {
               <option value={EncryptionType.SSL}>SSL/TLS</option>
             </select>
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Password (not saved)
+          </label>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full pr-11 pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Only used when sending"
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-600"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            This field is cleared every visit and never stored with your defaults.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
