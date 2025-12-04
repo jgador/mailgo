@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Users, Mail, PlusCircle } from 'lucide-react';
+import { LayoutDashboard, Users, Mail, PlusCircle, Settings } from 'lucide-react';
 
 const Layout: React.FC = () => {
   const navClass = ({ isActive }: { isActive: boolean }) =>
@@ -17,7 +17,7 @@ const Layout: React.FC = () => {
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
             <Mail className="w-6 h-6 text-blue-400" />
-            <span>LocalMail</span>
+            <span>MailGo</span>
           </div>
           <p className="text-xs text-gray-500 mt-1">Self-hosted Campaigns</p>
         </div>
@@ -39,6 +39,10 @@ const Layout: React.FC = () => {
           <NavLink to="/campaigns/new" className={navClass}>
             <PlusCircle size={20} />
             <span>New Campaign</span>
+          </NavLink>
+          <NavLink to="/settings" className={navClass}>
+            <Settings size={20} />
+            <span>Sender Setup</span>
           </NavLink>
         </nav>
 

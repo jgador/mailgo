@@ -37,6 +37,7 @@ REACT_APP_API_BASE_URL=http://localhost:5000/api npm start
 ```
 
 `npm start` launches the React dev server on `http://localhost:3000`. Persist settings in `frontend/app/.env.local` (keys must stay prefixed with `REACT_APP_`) instead of exporting them every time.
+Use the `Settings ▸ Sender Setup` page inside the dashboard to capture SMTP host, port, encryption, and “from” overrides—those values are stored in your browser and pre-fill the send dialogs, but passwords are still provided at send time.
 
 ## Docker Compose
 

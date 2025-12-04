@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { EncryptionType, SendNowRequest, SendTestRequest } from '../types';
 import { X, Lock, Send, Mail } from 'lucide-react';
+import { loadSmtpDefaults } from '../utils/smtpDefaults';
 
 interface SmtpModalProps {
   isOpen: boolean;
@@ -17,27 +18,37 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
   isTest = false,
   title = 'SMTP Configuration',
 }) => {
-  const env = process.env;
-  const [host, setHost] = useState(env?.REACT_APP_SMTP_DEFAULT_HOST || '');
-  const [port, setPort] = useState<number>(Number(env?.REACT_APP_SMTP_DEFAULT_PORT) || 587);
+  const DEFAULT_PORT = 587;
+  const [host, setHost] = useState('');
+  const [port, setPort] = useState<number>(DEFAULT_PORT);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [encryption, setEncryption] = useState<EncryptionType>(EncryptionType.StartTls);
   const [testEmail, setTestEmail] = useState('');
-  const [encryptionHostname, setEncryptionHostname] = useState(env?.REACT_APP_SMTP_ENCRYPTION_HOSTNAME || '');
-  const [allowSelfSigned, setAllowSelfSigned] = useState(
-    (env?.REACT_APP_SMTP_ALLOW_SELF_SIGNED || '').toLowerCase() === 'true'
-  );
-  const [overrideFromName, setOverrideFromName] = useState(env?.REACT_APP_SMTP_FROM_NAME || '');
-  const [overrideFromAddress, setOverrideFromAddress] = useState(env?.REACT_APP_SMTP_FROM_ADDRESS || '');
+  const [encryptionHostname, setEncryptionHostname] = useState('');
+  const [allowSelfSigned, setAllowSelfSigned] = useState(false);
+  const [overrideFromName, setOverrideFromName] = useState('');
+  const [overrideFromAddress, setOverrideFromAddress] = useState('');
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      return;
+    }
+    const defaults = loadSmtpDefaults();
+    setHost(defaults.host || '');
+    setPort(defaults.port || DEFAULT_PORT);
+    setUsername(defaults.username || '');
+    setEncryption(defaults.encryption || EncryptionType.StartTls);
+    setEncryptionHostname(defaults.encryptionHostname || '');
+    setAllowSelfSigned(Boolean(defaults.allowSelfSigned));
+    setOverrideFromName(defaults.overrideFromName || '');
+    setOverrideFromAddress(defaults.overrideFromAddress || '');
     setError(null);
     setLoading(false);
+    setPassword('');
     if (isTest) {
       setTestEmail('');
     }
