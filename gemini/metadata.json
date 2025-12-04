@@ -1,0 +1,4 @@
+{
+  "name": "LocalMail",
+  "description": "A self-hosted local email campaign tool for managing recipients and sending campaigns via SMTP."
+}
