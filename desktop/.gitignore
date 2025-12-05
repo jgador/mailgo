@@ -1,0 +1,7 @@
+dist/
+out/
+resources/frontend/
+resources/backend/
+node_modules/
+npm-debug.log*
+*.log

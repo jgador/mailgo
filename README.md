@@ -1,60 +1,79 @@
 # Mailgo - Local Email Campaign Tool
 
-Local-first email campaign manager featuring an ASP.NET Core API (SQLite + EF Core) and a React dashboard. Backend and frontend code now live in separate top-level folders so their lifecycles can evolve independently.
+Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), a React dashboard, and an optional Electron desktop shell that bundles both.
 
-## Repository Layout
+## Table of Contents
+- [Overview](#overview)
+- [Quick Start (web)](#quick-start-web)
+- [Desktop (Electron)](#desktop-electron)
+- [Docker Compose](#docker-compose)
+- [Docs](#docs)
+- [Repository Layout](#repository-layout)
 
-- `backend/` – .NET solution (`Mailgo.sln`), API + domain projects, backend Dockerfile
-- `frontend/` – CRA dashboard source (`app/`), frontend Dockerfile, UI tests
-- `infra/` – `docker-compose.yml` plus deployment-facing docs
-- `docs/` – architecture & product docs (`docs/product/prd.md`, etc.)
-- `data/` – local SQLite files mounted into containers (gitignored)
-- `scripts/` – shared automation entry points (currently placeholder)
-- `recipient-sample.csv` – CSV format reference for recipient imports
+## Overview
+- Web UI built with Create React App + TypeScript; API built with ASP.NET Core + EF Core (SQLite).
+- SMTP credentials are only provided at send time; nothing sensitive is persisted server-side.
+- Choose your runtime:
+  - Web/Docker: run the API and CRA build behind Nginx.
+  - Desktop: Electron wrapper that ships the CRA build and backend together.
 
-## Prerequisites
+## Quick Start (web)
+1. API
+   ```bash
+   cd backend
+   dotnet build Mailgo.sln
+   dotnet run --project src/Mailgo.Api/Mailgo.Api.csproj
+   ```
+   - Default URL: `http://localhost:5000` (override with `ASPNETCORE_URLS`).
+2. Frontend
+   ```bash
+   cd frontend/app
+   npm install
+   REACT_APP_API_BASE_URL=http://localhost:5000/api npm start
+   ```
+   - CRA dev server runs on `http://localhost:3000`.
+   - Persist settings in `frontend/app/.env.local` (`REACT_APP_` prefix required).
 
-- .NET 10 SDK
-- Node 22+ & npm (for the frontend)
-- Docker & Docker Compose (optional, for containerized runs)
-
-## Running the API locally
-
-```bash
-cd backend
-dotnet build Mailgo.sln
-dotnet run --project src/Mailgo.Api/Mailgo.Api.csproj
-```
-
-The API listens on `http://localhost:5000` by default (configure via `ConnectionStrings__Default` and the `ASPNETCORE_URLS` environment variables). SMTP host/credential details are provided per send from the frontend, so nothing is stored in `appsettings` or environment variables.
-
-## Running the frontend locally
-
-```bash
-cd frontend/app
-npm install
-REACT_APP_API_BASE_URL=http://localhost:5000/api npm start
-```
-
-`npm start` launches the React dev server on `http://localhost:3000`. Persist settings in `frontend/app/.env.local` (keys must stay prefixed with `REACT_APP_`) instead of exporting them every time.
-Use the `Settings → Sender Setup` page inside the dashboard to capture SMTP host, port, encryption, and “from” overrides—those values are stored in your browser and pre-fill the send dialogs, but passwords are still provided per test/send.
+## Desktop (Electron)
+- Location: `desktop/` (uses the same CRA build and backend binaries).
+- Prerequisites: Node 22+, .NET 10 SDK.
+- Dev (starts CRA, backend `dotnet watch`, and Electron pointing at the dev server):
+  ```bash
+  cd desktop
+  npm install
+  npm run dev
+  ```
+- Build installer (bundles frontend build + published backend, outputs to `desktop/out/`):
+  ```bash
+  cd desktop
+  npm install
+  npm run build
+  ```
+  - Backend listens on `http://localhost:5850/api` inside the desktop app; SQLite lives in your OS user data folder.
+  - See `docs/electron/README.md` for structure, ports, and troubleshooting.
 
 ## Docker Compose
-
 ```bash
 cd infra
 docker compose up --build
 ```
+- `api` (ASP.NET Core) on `localhost:5000`
+- `web` (CRA build served via Nginx) on `localhost:3000`, proxying `/api`
+- SQLite data persisted in `../data`
 
-- `api` (ASP.NET Core) listens on `localhost:5000`
-- `web` (CRA build served via Nginx) listens on `localhost:3000` and proxies `/api` to the API container
+## Docs
+- Product PRD: `docs/product/prd.md`
+- Electron/Desktop guide: `docs/electron/README.md`
+- Backend notes: `backend/README.md`
+- Frontend notes: `frontend/app/README.md`
+- Infra/compose notes: `infra/README.md`
 
-SQLite data is persisted in `../data` relative to `infra/`. SMTP details are supplied entirely through the UI at send time, so there are no SMTP-specific environment variables.
-
-## Key Features
-
-- Recipient CSV ingestion with validation/deduplication (stored in SQLite)
-- Campaign CRUD lifecycle (Draft -> Sending -> Completed/Failed) with live status
-- SMTP test sends + production sends with per-send credentials (host, port, encryption/SNI hostname, self-signed toggle, from overrides) stored only in memory
-- Background worker that batches SMTP deliveries and records per-recipient logs
-- React dashboard covering dashboard stats, recipient management, campaign editing, previewing, and log inspection
+## Repository Layout
+- `backend/` - .NET solution (`Mailgo.sln`), API + domain projects, backend Dockerfile
+- `frontend/` - CRA dashboard source (`app/`), frontend Dockerfile, UI tests
+- `desktop/` - Electron shell, build scripts, and packaging configuration
+- `infra/` - `docker-compose.yml` plus deployment-facing docs
+- `docs/` - architecture & product docs
+- `data/` - local SQLite files mounted into containers (gitignored)
+- `scripts/` - shared automation entry points (currently placeholder)
+- `recipient-sample.csv` - CSV format reference for recipient imports

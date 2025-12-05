@@ -1,3 +1,11 @@
+declare global {
+  interface Window {
+    electron?: {
+      apiBaseUrl?: string;
+    };
+  }
+}
+
 type ConfigValues = {
   apiBaseUrl: string;
 };
@@ -10,10 +18,16 @@ class AppConfig {
   }
 
   static fromEnv(): AppConfig {
-    const apiBaseUrl = (process.env.REACT_APP_API_BASE_URL ?? '').trim();
+    const envApiBaseUrl = (process.env.REACT_APP_API_BASE_URL ?? '').trim();
+    const electronApiBaseUrl =
+      typeof window !== 'undefined' && window.electron?.apiBaseUrl
+        ? window.electron.apiBaseUrl.trim()
+        : '';
+
+    const apiBaseUrl = envApiBaseUrl || electronApiBaseUrl;
 
     if (!apiBaseUrl) {
-      throw new Error('REACT_APP_API_BASE_URL must be set (e.g. in .env.local).');
+      throw new Error('API base URL must be set via REACT_APP_API_BASE_URL or provided by the desktop shell.');
     }
 
     return new AppConfig({ apiBaseUrl });

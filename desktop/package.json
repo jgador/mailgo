@@ -1,0 +1,29 @@
+{
+  "name": "mailgo-desktop",
+  "version": "1.0.0-rc1",
+  "description": "Electron shell for the Mailgo local email campaign app.",
+  "private": true,
+  "main": "dist/main/main.js",
+  "scripts": {
+    "dev": "concurrently -k -n FRONTEND,BACKEND,ELECTRON -c yellow,cyan,magenta \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:electron\"",
+    "dev:frontend": "npm --prefix ../frontend/app start",
+    "dev:backend": "cross-env ASPNETCORE_URLS=http://localhost:5850 dotnet watch --project ../backend/src/Mailgo.Api/Mailgo.Api.csproj",
+    "dev:electron": "wait-on http://localhost:3000 && cross-env ELECTRON_RENDERER_URL=http://localhost:3000 electron -r ts-node/register ./src/main/main.ts",
+    "build": "npm run build:frontend && npm run build:backend && npm run build:electron",
+    "build:frontend": "cross-env PUBLIC_URL=. npm --prefix ../frontend/app run build && node ./scripts/sync-frontend.js",
+    "build:backend": "node ./scripts/build-backend.js",
+    "build:electron": "tsc -p tsconfig.json && electron-builder",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "concurrently": "^9.0.1",
+    "cross-env": "^7.0.3",
+    "electron": "^33.2.0",
+    "electron-builder": "^24.13.3",
+    "fs-extra": "^11.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "wait-on": "^8.0.2"
+  }
+}
