@@ -1,4 +1,23 @@
+using System.Text.Json.Serialization;
+
 namespace Mailgo.Api.Responses;
 
-public record RecipientUploadResultResponse(int TotalRows, int Inserted, int SkippedInvalid);
+public class RecipientUploadResultResponse
+{
+    public RecipientUploadResultResponse(int totalRows, int inserted, int skippedInvalid)
+    {
+        TotalRows = totalRows;
+        Inserted = inserted;
+        SkippedInvalid = skippedInvalid;
+    }
+
+    [JsonPropertyName("totalRows")]
+    public int TotalRows { get; }
+
+    [JsonPropertyName("inserted")]
+    public int Inserted { get; }
+
+    [JsonPropertyName("skippedInvalid")]
+    public int SkippedInvalid { get; }
+}
 
