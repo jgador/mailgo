@@ -3,6 +3,7 @@ services:
     build:
       context: ../backend
       dockerfile: docker/api.Dockerfile
+    container_name: api
     environment:
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Default: Data Source=/data/app.db
@@ -16,7 +17,10 @@ services:
       context: ../frontend
       dockerfile: docker/web.Dockerfile
       args:
-        REACT_APP_API_BASE_URL: /api
+        # Point the frontend directly at the exposed API port on the host.
+        # Nginx still proxies /api -> api:8080, but this avoids relying on that path.
+        REACT_APP_API_BASE_URL: http://localhost:5000/api
+    container_name: app
     depends_on:
       - api
     ports:
