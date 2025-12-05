@@ -1,6 +1,6 @@
-using EmailMarketing.Api.Enums;
+using Mailgo.Api.Enums;
 
-namespace EmailMarketing.Api.Services;
+namespace Mailgo.Api.Services;
 
 public record SmtpSettings(
     string Host,
@@ -12,3 +12,4 @@ public record SmtpSettings(
     bool AllowSelfSignedCertificates,
     string? OverrideFromName,
     string? OverrideFromAddress);
+

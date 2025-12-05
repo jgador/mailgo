@@ -1,6 +1,6 @@
-using EmailMarketing.Domain.Entities;
+using Mailgo.Domain.Entities;
 
-namespace EmailMarketing.Api.Services;
+namespace Mailgo.Api.Services;
 
 public interface IEmailSender
 {
@@ -11,3 +11,4 @@ public interface IEmailSender
         CancellationToken cancellationToken,
         string? overrideRecipientEmail = null);
 }
+

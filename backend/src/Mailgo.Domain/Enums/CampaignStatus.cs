@@ -1,4 +1,4 @@
-namespace EmailMarketing.Domain.Enums;
+namespace Mailgo.Domain.Enums;
 
 public enum CampaignStatus
 {
@@ -7,3 +7,4 @@ public enum CampaignStatus
     Completed = 2,
     Failed = 3
 }
+

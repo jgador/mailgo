@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace EmailMarketing.Api.Requests;
+namespace Mailgo.Api.Requests;
 
 public class CampaignUpsertRequest
 {
@@ -21,3 +21,4 @@ public class CampaignUpsertRequest
 
     public string? TextBody { get; set; }
 }
+

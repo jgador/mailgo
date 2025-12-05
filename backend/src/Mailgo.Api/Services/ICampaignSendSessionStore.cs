@@ -1,4 +1,4 @@
-namespace EmailMarketing.Api.Services;
+namespace Mailgo.Api.Services;
 
 public interface ICampaignSendSessionStore
 {
@@ -6,3 +6,4 @@ public interface ICampaignSendSessionStore
     bool TryGet(Guid campaignId, out CampaignSendSession? session);
     void Remove(Guid campaignId);
 }
+

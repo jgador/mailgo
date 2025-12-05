@@ -1,4 +1,4 @@
-namespace EmailMarketing.Api.Responses;
+namespace Mailgo.Api.Responses;
 
 public record RecipientResponse(
     Guid Id,
@@ -6,3 +6,4 @@ public record RecipientResponse(
     string? FirstName,
     string? LastName,
     DateTime CreatedAt);
+

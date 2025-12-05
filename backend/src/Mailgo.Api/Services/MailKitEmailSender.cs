@@ -1,12 +1,12 @@
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using EmailMarketing.Api.Enums;
-using EmailMarketing.Domain.Entities;
+using Mailgo.Api.Enums;
+using Mailgo.Domain.Entities;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 
-namespace EmailMarketing.Api.Services;
+namespace Mailgo.Api.Services;
 
 public class MailKitEmailSender : IEmailSender
 {
@@ -80,3 +80,4 @@ public class MailKitEmailSender : IEmailSender
         await client.DisconnectAsync(true, cancellationToken);
     }
 }
+

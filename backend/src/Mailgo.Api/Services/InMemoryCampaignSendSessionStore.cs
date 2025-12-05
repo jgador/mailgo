@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace EmailMarketing.Api.Services;
+namespace Mailgo.Api.Services;
 
 public class InMemoryCampaignSendSessionStore : ICampaignSendSessionStore
 {
@@ -15,3 +15,4 @@ public class InMemoryCampaignSendSessionStore : ICampaignSendSessionStore
     public void Remove(Guid campaignId) =>
         _sessions.TryRemove(campaignId, out _);
 }
+

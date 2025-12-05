@@ -1,6 +1,6 @@
-using EmailMarketing.Domain.Entities;
+using Mailgo.Domain.Entities;
 
-namespace EmailMarketing.Api.Responses;
+namespace Mailgo.Api.Responses;
 
 public static class ResponseMapper
 {
@@ -60,3 +60,4 @@ public static class ResponseMapper
             log.ErrorMessage,
             log.SentAt);
 }
+

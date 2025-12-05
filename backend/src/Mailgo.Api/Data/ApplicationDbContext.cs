@@ -1,7 +1,7 @@
-using EmailMarketing.Domain.Entities;
+using Mailgo.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace EmailMarketing.Api.Data;
+namespace Mailgo.Api.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
     : DbContext(options)
@@ -26,3 +26,4 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasIndex(l => new { l.CampaignId, l.RecipientId });
     }
 }
+

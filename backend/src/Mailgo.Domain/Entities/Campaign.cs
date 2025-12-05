@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using EmailMarketing.Domain.Enums;
+using Mailgo.Domain.Enums;
 
-namespace EmailMarketing.Domain.Entities;
+namespace Mailgo.Domain.Entities;
 
 public class Campaign
 {
@@ -36,3 +36,4 @@ public class Campaign
 
     public ICollection<CampaignSendLog> SendLogs { get; set; } = new List<CampaignSendLog>();
 }
+

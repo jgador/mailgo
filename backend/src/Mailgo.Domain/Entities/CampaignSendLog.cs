@@ -1,6 +1,6 @@
-using EmailMarketing.Domain.Enums;
+using Mailgo.Domain.Enums;
 
-namespace EmailMarketing.Domain.Entities;
+namespace Mailgo.Domain.Entities;
 
 public class CampaignSendLog
 {
@@ -18,3 +18,4 @@ public class CampaignSendLog
 
     public DateTime? SentAt { get; set; }
 }
+

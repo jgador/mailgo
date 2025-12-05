@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace EmailMarketing.Api.Migrations
+namespace Mailgo.Api.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -106,3 +106,4 @@ namespace EmailMarketing.Api.Migrations
         }
     }
 }
+

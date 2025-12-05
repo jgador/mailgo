@@ -1,4 +1,4 @@
-namespace EmailMarketing.Api.Responses;
+namespace Mailgo.Api.Responses;
 
 public record PagedResult<T>(
     IReadOnlyCollection<T> Items,
@@ -6,3 +6,4 @@ public record PagedResult<T>(
     int PageSize,
     int TotalItems,
     int TotalPages);
+

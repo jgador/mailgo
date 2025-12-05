@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using EmailMarketing.Api.Background;
-using EmailMarketing.Api.Data;
-using EmailMarketing.Api.Services;
+using Mailgo.Api.Background;
+using Mailgo.Api.Data;
+using Mailgo.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,3 +57,4 @@ app.UseCors("default");
 app.MapControllers();
 
 app.Run();
+

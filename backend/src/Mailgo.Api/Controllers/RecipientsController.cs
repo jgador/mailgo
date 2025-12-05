@@ -2,13 +2,13 @@ using System.Globalization;
 using System.Net.Mail;
 using CsvHelper;
 using CsvHelper.Configuration;
-using EmailMarketing.Api.Data;
-using EmailMarketing.Api.Responses;
-using EmailMarketing.Domain.Entities;
+using Mailgo.Api.Data;
+using Mailgo.Api.Responses;
+using Mailgo.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace EmailMarketing.Api.Controllers;
+namespace Mailgo.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -149,3 +149,4 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
         }
     }
 }
+

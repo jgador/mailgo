@@ -1,12 +1,12 @@
-using EmailMarketing.Api.Data;
-using EmailMarketing.Api.Services;
-using EmailMarketing.Domain.Entities;
-using EmailMarketing.Domain.Enums;
+using Mailgo.Api.Data;
+using Mailgo.Api.Services;
+using Mailgo.Domain.Entities;
+using Mailgo.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace EmailMarketing.Api.Background;
+namespace Mailgo.Api.Background;
 
 public class CampaignSenderService(
     IServiceScopeFactory scopeFactory,
@@ -145,3 +145,4 @@ public class CampaignSenderService(
         return message.Length <= 512 ? message : message[..512];
     }
 }
+

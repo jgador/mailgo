@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace EmailMarketing.Domain.Entities;
+namespace Mailgo.Domain.Entities;
 
 public class Recipient
 {
@@ -19,3 +19,4 @@ public class Recipient
 
     public ICollection<CampaignSendLog> SendLogs { get; set; } = new List<CampaignSendLog>();
 }
+

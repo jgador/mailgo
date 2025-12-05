@@ -1,13 +1,13 @@
-using EmailMarketing.Api.Data;
-using EmailMarketing.Api.Responses;
-using EmailMarketing.Api.Requests;
-using EmailMarketing.Api.Services;
-using EmailMarketing.Domain.Entities;
-using EmailMarketing.Domain.Enums;
+using Mailgo.Api.Data;
+using Mailgo.Api.Responses;
+using Mailgo.Api.Requests;
+using Mailgo.Api.Services;
+using Mailgo.Domain.Entities;
+using Mailgo.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace EmailMarketing.Api.Controllers;
+namespace Mailgo.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -239,3 +239,4 @@ public class CampaignsController(
         return Accepted();
     }
 }
+

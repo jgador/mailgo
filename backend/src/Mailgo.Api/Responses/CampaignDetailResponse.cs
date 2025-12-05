@@ -1,6 +1,6 @@
-using EmailMarketing.Domain.Enums;
+using Mailgo.Domain.Enums;
 
-namespace EmailMarketing.Api.Responses;
+namespace Mailgo.Api.Responses;
 
 public record CampaignDetailResponse(
     Guid Id,
@@ -16,3 +16,4 @@ public record CampaignDetailResponse(
     int FailedCount,
     DateTime CreatedAt,
     DateTime LastUpdatedAt);
+

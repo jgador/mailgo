@@ -1,6 +1,6 @@
-using EmailMarketing.Domain.Enums;
+using Mailgo.Domain.Enums;
 
-namespace EmailMarketing.Api.Responses;
+namespace Mailgo.Api.Responses;
 
 public record CampaignSendLogResponse(
     Guid Id,
@@ -10,3 +10,4 @@ public record CampaignSendLogResponse(
     CampaignSendStatus Status,
     string? ErrorMessage,
     DateTime? SentAt);
+

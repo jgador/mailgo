@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using EmailMarketing.Api.Enums;
-using EmailMarketing.Api.Services;
+using Mailgo.Api.Enums;
+using Mailgo.Api.Services;
 
-namespace EmailMarketing.Api.Requests;
+namespace Mailgo.Api.Requests;
 
 public class SmtpSettingsRequest
 {
@@ -41,3 +41,4 @@ public class SmtpSettingsRequest
             string.IsNullOrWhiteSpace(OverrideFromName) ? null : OverrideFromName,
             string.IsNullOrWhiteSpace(OverrideFromAddress) ? null : OverrideFromAddress);
 }
+

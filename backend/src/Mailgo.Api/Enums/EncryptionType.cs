@@ -1,4 +1,4 @@
-namespace EmailMarketing.Api.Enums;
+namespace Mailgo.Api.Enums;
 
 public enum EncryptionType
 {
@@ -6,3 +6,4 @@ public enum EncryptionType
     SSL,
     StartTls
 }
+

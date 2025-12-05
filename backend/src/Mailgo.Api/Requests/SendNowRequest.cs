@@ -1,3 +1,4 @@
-namespace EmailMarketing.Api.Requests;
+namespace Mailgo.Api.Requests;
 
 public class SendNowRequest : SmtpSettingsRequest;
+
