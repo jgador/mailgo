@@ -1,6 +1,6 @@
 import { app, BrowserWindow, shell } from 'electron';
 import path from 'path';
-import { getFrontendEntry } from './config';
+import { getAppIcon, getFrontendEntry } from './config';
 import { startBackend, stopBackend } from './backend';
 
 const APP_VERSION = app.getVersion();
@@ -12,6 +12,7 @@ const createWindow = () => {
   const win = new BrowserWindow({
     width: 1280,
     height: 800,
+    icon: getAppIcon(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

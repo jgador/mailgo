@@ -96,7 +96,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
           <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-            <Lock className="w-4 h-4 text-blue-600" />
+            <Lock className="w-4 h-4 text-brand-blue" />
             {title}
           </h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -121,7 +121,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
                   required
                   value={testEmail}
                   onChange={(e) => setTestEmail(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue focus:border-brand-blue outline-none transition-all"
                   placeholder="you@example.com"
                 />
               </div>
@@ -136,7 +136,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
                 required
                 value={host}
                 onChange={(e) => setHost(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
                 placeholder="smtp.example.com"
               />
             </div>
@@ -147,7 +147,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
                 required
                 value={port}
                 onChange={(e) => setPort(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
                 placeholder="587"
               />
             </div>
@@ -159,7 +159,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
               <select
                 value={encryption}
                 onChange={(e) => setEncryption(e.target.value as EncryptionType)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               >
                 <option value={EncryptionType.None}>None</option>
                 <option value={EncryptionType.StartTls}>STARTTLS</option>
@@ -174,7 +174,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
               type="text"
               value={encryptionHostname}
               onChange={(e) => setEncryptionHostname(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="mail.example.com"
             />
           </div>
@@ -182,7 +182,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
           <label className="flex items-center gap-2 text-sm text-gray-700">
             <input
               type="checkbox"
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+              className="w-4 h-4 text-brand-blue border-gray-300 rounded"
               checked={allowSelfSigned}
               onChange={(e) => setAllowSelfSigned(e.target.checked)}
             />
@@ -195,7 +195,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="apikey or email"
             />
           </div>
@@ -207,7 +207,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
                 type="text"
                 value={overrideFromName}
                 onChange={(e) => setOverrideFromName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
                 placeholder="Mail Go"
               />
             </div>
@@ -217,7 +217,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
                 type="email"
                 value={overrideFromAddress}
                 onChange={(e) => setOverrideFromAddress(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
                 placeholder="no-reply@example.com"
               />
             </div>
@@ -230,7 +230,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pr-11 pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full pr-11 pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
                 placeholder="********"
                 autoComplete="new-password"
               />
@@ -250,7 +250,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 bg-brand-blue hover:bg-brand-blue-dark text-white font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

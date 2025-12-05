@@ -11,6 +11,8 @@ extraResources:
     to: frontend
   - from: resources/backend
     to: backend
+  - from: src/assets/icons
+    to: icons
 asar: true
 win:
   target:

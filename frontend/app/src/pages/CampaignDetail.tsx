@@ -85,7 +85,7 @@ const CampaignDetail: React.FC = () => {
         </div>
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
             <div className="text-sm text-gray-500 mb-1">Completion</div>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-brand-blue">
                 {campaign.totalRecipients > 0
                     ? Math.round(((campaign.sentCount + campaign.failedCount) / campaign.totalRecipients) * 100)
                     : 0
@@ -118,7 +118,7 @@ const CampaignDetail: React.FC = () => {
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col max-h-[600px]">
             <div className="p-4 border-b border-gray-100 font-semibold text-gray-800 flex justify-between items-center">
                 <span>Send Logs</span>
-                <button onClick={loadData} className="text-gray-400 hover:text-blue-600 transition-colors">
+                <button onClick={loadData} className="text-gray-400 hover:text-brand-blue transition-colors">
                     <RefreshCw size={16} />
                 </button>
             </div>

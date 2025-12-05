@@ -210,7 +210,7 @@ const CampaignEditor: React.FC = () => {
                 </button>
                 <button
                     onClick={handleOpenSendModal}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50"
+                    className="flex items-center gap-2 bg-brand-blue text-white px-4 py-2 rounded-lg hover:bg-brand-blue-dark transition-colors shadow-sm disabled:opacity-50"
                     disabled={preparingAction === 'send'}
                 >
                     <Send size={18} />
@@ -238,7 +238,7 @@ const CampaignEditor: React.FC = () => {
                         value={formData.name}
                         onChange={handleChange}
                         disabled={isReadOnly}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
                         placeholder="e.g. Monthly Newsletter"
                     />
                 </div>
@@ -251,7 +251,7 @@ const CampaignEditor: React.FC = () => {
                         value={formData.subject}
                         onChange={handleChange}
                         disabled={isReadOnly}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
                         placeholder="Great news inside!"
                     />
                 </div>
@@ -265,7 +265,7 @@ const CampaignEditor: React.FC = () => {
                             value={formData.fromName}
                             onChange={handleChange}
                             disabled={isReadOnly}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
                             placeholder="John Doe"
                         />
                     </div>
@@ -277,7 +277,7 @@ const CampaignEditor: React.FC = () => {
                             value={formData.fromEmail}
                             onChange={handleChange}
                             disabled={isReadOnly}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
                             placeholder="john@example.com"
                         />
                     </div>
@@ -294,7 +294,7 @@ const CampaignEditor: React.FC = () => {
                         onChange={handleChange}
                         disabled={isReadOnly}
                         rows={10}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm disabled:bg-gray-100"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none font-mono text-sm disabled:bg-gray-100"
                         placeholder="<h1>Hello!</h1><p>...</p>"
                     />
                 </div>
@@ -307,7 +307,7 @@ const CampaignEditor: React.FC = () => {
                         onChange={handleChange}
                         disabled={isReadOnly}
                         rows={4}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm disabled:bg-gray-100"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none font-mono text-sm disabled:bg-gray-100"
                         placeholder="Plain text version..."
                     />
                 </div>

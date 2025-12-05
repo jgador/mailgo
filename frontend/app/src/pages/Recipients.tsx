@@ -74,7 +74,7 @@ const RecipientsPage: React.FC = () => {
             className={`flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 cursor-pointer shadow-sm transition-all ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
           >
             {uploading ? (
-               <span className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+              <span className="w-5 h-5 border-2 border-gray-300 border-t-brand-blue rounded-full animate-spin" />
             ) : (
                <Upload size={18} />
             )}

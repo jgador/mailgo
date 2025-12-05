@@ -27,7 +27,7 @@ const Dashboard: React.FC = () => {
   const getStatusColor = (status: CampaignStatus) => {
     switch (status) {
       case CampaignStatus.Draft: return 'bg-gray-100 text-gray-600';
-      case CampaignStatus.Sending: return 'bg-blue-100 text-blue-600';
+      case CampaignStatus.Sending: return 'bg-brand-blue/10 text-brand-blue';
       case CampaignStatus.Completed: return 'bg-green-100 text-green-600';
       case CampaignStatus.Failed: return 'bg-red-100 text-red-600';
       default: return 'bg-gray-100 text-gray-600';
@@ -45,7 +45,7 @@ const Dashboard: React.FC = () => {
         </div>
         <Link
           to="/campaigns/new"
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+          className="flex items-center gap-2 bg-brand-blue text-white px-4 py-2 rounded-lg hover:bg-brand-blue-dark transition-colors shadow-sm"
         >
           <Plus size={18} />
           <span>Create Campaign</span>
@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
       {/* Stats Cards (Mocked aggregated data for visual) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-           <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+           <div className="p-3 bg-brand-blue/10 text-brand-blue rounded-lg">
              <BarChart2 size={24} />
            </div>
            <div>
@@ -114,7 +114,7 @@ const Dashboard: React.FC = () => {
                 {campaigns.map((campaign) => (
                   <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-900">
-                      <Link to={`/campaigns/${campaign.id}`} className="hover:text-blue-600 hover:underline">
+                      <Link to={`/campaigns/${campaign.id}`} className="hover:text-brand-blue hover:underline">
                         {campaign.name}
                       </Link>
                       <div className="text-xs text-gray-400 font-normal">{campaign.subject}</div>
@@ -134,7 +134,7 @@ const Dashboard: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                       <Link to={`/campaigns/${campaign.id}`} className="text-blue-600 hover:text-blue-800 font-medium text-xs">
+                      <Link to={`/campaigns/${campaign.id}`} className="text-brand-blue hover:text-brand-blue-dark font-medium text-xs">
                          View
                        </Link>
                     </td>

@@ -81,7 +81,7 @@ const SettingsPage: React.FC = () => {
               required
               value={form.host}
               onChange={(e) => handleChange('host', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="smtp.yourprovider.com"
             />
           </div>
@@ -93,7 +93,7 @@ const SettingsPage: React.FC = () => {
               required
               value={form.port}
               onChange={(e) => handleChange('port', Number(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="587"
             />
           </div>
@@ -106,7 +106,7 @@ const SettingsPage: React.FC = () => {
               type="text"
               value={form.username || ''}
               onChange={(e) => handleChange('username', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="apikey or email"
             />
           </div>
@@ -115,7 +115,7 @@ const SettingsPage: React.FC = () => {
             <select
               value={form.encryption}
               onChange={(e) => handleChange('encryption', e.target.value as EncryptionType)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
             >
               <option value={EncryptionType.None}>None</option>
               <option value={EncryptionType.StartTls}>STARTTLS</option>
@@ -133,7 +133,7 @@ const SettingsPage: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pr-11 pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full pr-11 pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="Only used when sending"
               autoComplete="new-password"
             />
@@ -160,7 +160,7 @@ const SettingsPage: React.FC = () => {
               type="text"
               value={form.encryptionHostname || ''}
               onChange={(e) => handleChange('encryptionHostname', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="mail.example.com"
             />
           </div>
@@ -170,7 +170,7 @@ const SettingsPage: React.FC = () => {
               type="checkbox"
               checked={form.allowSelfSigned}
               onChange={(e) => handleChange('allowSelfSigned', e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+              className="w-4 h-4 text-brand-blue border-gray-300 rounded"
             />
             <label htmlFor="allowSelfSigned" className="text-sm text-gray-700">
               Allow self-signed certificates
@@ -187,7 +187,7 @@ const SettingsPage: React.FC = () => {
               type="text"
               value={form.overrideFromName || ''}
               onChange={(e) => handleChange('overrideFromName', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="MailGo"
             />
           </div>
@@ -199,7 +199,7 @@ const SettingsPage: React.FC = () => {
               type="email"
               value={form.overrideFromAddress || ''}
               onChange={(e) => handleChange('overrideFromAddress', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="no-reply@example.com"
             />
           </div>
@@ -209,7 +209,7 @@ const SettingsPage: React.FC = () => {
           <button
             type="submit"
             disabled={status === 'saving'}
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {status === 'saving' ? 'Saving...' : 'Save Defaults'}
           </button>

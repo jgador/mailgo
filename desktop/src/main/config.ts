@@ -27,3 +27,12 @@ export const getDataDirectory = () => {
   const dataDir = path.join(app.getPath('userData'), 'data');
   return dataDir;
 };
+
+export const getAppIcon = () => {
+  if (!app.isPackaged) {
+    return path.resolve(__dirname, '../assets/icons/icon.png');
+  }
+
+  const resourcesPath = (process as NodeJS.Process & { resourcesPath: string }).resourcesPath;
+  return path.join(resourcesPath, 'icons', 'icon.png');
+};
