@@ -1,11 +1,10 @@
 // Licensed under the MIT License.
 // See the LICENSE file in the project root for full license information.
 
-using Mailgo.Api.Data;
 using Mailgo.Api.Services;
+using Mailgo.Api.Stores;
 using Mailgo.Domain.Entities;
 using Mailgo.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace Mailgo.Api.Background;
 
@@ -26,33 +25,28 @@ public class CampaignSenderService(
             try
             {
                 using var scope = scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var campaignStore = scope.ServiceProvider.GetRequiredService<CampaignStore>();
 
-                var campaign = await dbContext.Campaigns
-                    .Where(c => c.Status == CampaignStatus.Sending)
-                    .OrderBy(c => c.CreatedAt)
-                    .FirstOrDefaultAsync(stoppingToken);
+                var campaign = await campaignStore.GetNextSendingCampaignAsync(stoppingToken).ConfigureAwait(false);
 
                 if (campaign is null)
                 {
-                    await Task.Delay(IdlePollInterval, stoppingToken);
+                    await Task.Delay(IdlePollInterval, stoppingToken).ConfigureAwait(false);
                     continue;
                 }
 
                 if (!sessionStore.TryGet(campaign.Id, out var session) || session is null)
                 {
                     logger.LogWarning("Missing SMTP session for campaign {CampaignId}. Marking as failed.", campaign.Id);
-                    campaign.Status = CampaignStatus.Failed;
-                    campaign.LastUpdatedAt = DateTime.UtcNow;
-                    await dbContext.SaveChangesAsync(stoppingToken);
+                    await campaignStore.MarkCampaignAsFailedAsync(campaign, stoppingToken).ConfigureAwait(false);
                     continue;
                 }
 
-                var completed = await ProcessBatchAsync(dbContext, campaign, session, stoppingToken);
+                var completed = await ProcessBatchAsync(campaignStore, campaign, session, stoppingToken).ConfigureAwait(false);
 
                 if (!completed)
                 {
-                    await Task.Delay(ActivePollInterval, stoppingToken);
+                    await Task.Delay(ActivePollInterval, stoppingToken).ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException)
@@ -62,26 +56,24 @@ public class CampaignSenderService(
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unexpected error in campaign sender loop.");
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken).ConfigureAwait(false);
             }
         }
     }
 
     private async Task<bool> ProcessBatchAsync(
-        ApplicationDbContext dbContext,
+        CampaignStore campaignStore,
         Campaign campaign,
         CampaignSendSession session,
         CancellationToken cancellationToken)
     {
-        var pendingRecipients = await dbContext.Recipients
-            .Where(r => !dbContext.CampaignSendLogs.Any(l => l.CampaignId == campaign.Id && l.RecipientId == r.Id))
-            .OrderBy(r => r.CreatedAt)
-            .Take(BatchSize)
-            .ToListAsync(cancellationToken);
+        var pendingRecipients = await campaignStore
+            .GetPendingRecipientsAsync(campaign.Id, BatchSize, cancellationToken)
+            .ConfigureAwait(false);
 
         if (pendingRecipients.Count == 0)
         {
-            await FinalizeCampaignAsync(dbContext, campaign, cancellationToken);
+            await campaignStore.FinalizeCampaignAsync(campaign, cancellationToken).ConfigureAwait(false);
             sessionStore.Remove(campaign.Id);
             return true;
         }
@@ -100,7 +92,7 @@ public class CampaignSenderService(
 
             try
             {
-                await emailSender.SendAsync(campaign, recipient, session.Settings, cancellationToken);
+                await emailSender.SendAsync(campaign, recipient, session.Settings, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -112,28 +104,11 @@ public class CampaignSenderService(
             logs.Add(log);
         }
 
-        await dbContext.CampaignSendLogs.AddRangeAsync(logs, cancellationToken);
+        await campaignStore.AddSendLogsAsync(logs, cancellationToken).ConfigureAwait(false);
         campaign.LastUpdatedAt = DateTime.UtcNow;
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await campaignStore.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return false;
-    }
-
-    private static async Task FinalizeCampaignAsync(
-        ApplicationDbContext dbContext,
-        Campaign campaign,
-        CancellationToken cancellationToken)
-    {
-        var sent = await dbContext.CampaignSendLogs
-            .Where(l => l.CampaignId == campaign.Id && l.Status == CampaignSendStatus.Sent)
-            .CountAsync(cancellationToken);
-        var failed = await dbContext.CampaignSendLogs
-            .Where(l => l.CampaignId == campaign.Id && l.Status == CampaignSendStatus.Failed)
-            .CountAsync(cancellationToken);
-
-        campaign.Status = failed > 0 ? CampaignStatus.Failed : CampaignStatus.Completed;
-        campaign.LastUpdatedAt = DateTime.UtcNow;
-        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private static string? TruncateError(string? message)

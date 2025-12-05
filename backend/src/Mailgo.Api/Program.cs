@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Mailgo.Api.Background;
 using Mailgo.Api.Data;
 using Mailgo.Api.Services;
+using Mailgo.Api.Stores;
 using Microsoft.EntityFrameworkCore;
 
 public partial class Program
@@ -24,6 +25,8 @@ public partial class Program
 
         builder.Services.AddSingleton<ICampaignSendSessionStore, InMemoryCampaignSendSessionStore>();
         builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
+        builder.Services.AddScoped<CampaignStore>();
+        builder.Services.AddScoped<RecipientStore>();
         builder.Services.AddHostedService<CampaignSenderService>();
 
         builder.Services

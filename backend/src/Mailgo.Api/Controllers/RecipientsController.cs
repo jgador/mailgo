@@ -5,17 +5,16 @@ using System.Globalization;
 using System.Net.Mail;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Mailgo.Api.Data;
 using Mailgo.Api.Responses;
+using Mailgo.Api.Stores;
 using Mailgo.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Mailgo.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RecipientsController(ApplicationDbContext dbContext) : ControllerBase
+public class RecipientsController(RecipientStore recipientStore) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<PagedResult<RecipientResponse>>> GetRecipients(
@@ -26,21 +25,8 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 500);
 
-        var query = dbContext.Recipients.AsNoTracking().OrderByDescending(r => r.CreatedAt);
-        var totalItems = await query.CountAsync(cancellationToken);
-        var items = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
-
-        var dto = new PagedResult<RecipientResponse>(
-            items.Select(r => r.ToResponse()).ToList(),
-            page,
-            pageSize,
-            totalItems,
-            (int)Math.Ceiling(totalItems / (double)pageSize));
-
-        return Ok(dto);
+        var recipientsPage = await recipientStore.GetRecipientsAsync(page, pageSize, cancellationToken).ConfigureAwait(false);
+        return Ok(recipientsPage);
     }
 
     [HttpPost("upload")]
@@ -64,19 +50,14 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
         };
 
         var totalRows = 0;
-        var inserted = 0;
-        var skipped = 0;
+        var insertedCount = 0;
+        var skippedCount = 0;
 
-        var existingEmails = new HashSet<string>(
-            await dbContext.Recipients
-                .AsNoTracking()
-                .Select(r => r.Email.ToLowerInvariant())
-                .ToListAsync(cancellationToken),
-            StringComparer.OrdinalIgnoreCase);
+        var existingEmails = await recipientStore.GetExistingRecipientEmailsAsync(cancellationToken).ConfigureAwait(false);
 
         var newRecipients = new List<Recipient>();
 
-        await using var stream = file.OpenReadStream();
+        using var stream = file.OpenReadStream();
         using var reader = new StreamReader(stream);
         using var csv = new CsvReader(reader, config);
 
@@ -84,7 +65,7 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
         {
             if (config.HasHeaderRecord)
             {
-                if (!await csv.ReadAsync())
+                if (!await csv.ReadAsync().ConfigureAwait(false))
                 {
                     return BadRequest("CSV file is empty.");
                 }
@@ -92,14 +73,14 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
                 csv.ReadHeader();
             }
 
-            while (await csv.ReadAsync())
+            while (await csv.ReadAsync().ConfigureAwait(false))
             {
                 totalRows++;
                 var email = csv.GetField("email");
 
                 if (string.IsNullOrWhiteSpace(email) || !IsValidEmail(email))
                 {
-                    skipped++;
+                    skippedCount++;
                     continue;
                 }
 
@@ -108,7 +89,7 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
 
                 if (!existingEmails.Add(dedupeKey))
                 {
-                    skipped++;
+                    skippedCount++;
                     continue;
                 }
 
@@ -128,15 +109,10 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
             return BadRequest("CSV must contain at least an 'email' column.");
         }
 
-        if (newRecipients.Count > 0)
-        {
-            await dbContext.Recipients.AddRangeAsync(newRecipients, cancellationToken);
-            await dbContext.SaveChangesAsync(cancellationToken);
-            inserted = newRecipients.Count;
-        }
+        insertedCount = await recipientStore.SaveRecipientsAsync(newRecipients, cancellationToken).ConfigureAwait(false);
 
-        var result = new RecipientUploadResultResponse(totalRows, inserted, skipped);
-        return Ok(result);
+        var uploadResult = new RecipientUploadResultResponse(totalRows, insertedCount, skippedCount);
+        return Ok(uploadResult);
     }
 
     private static bool IsValidEmail(string email)

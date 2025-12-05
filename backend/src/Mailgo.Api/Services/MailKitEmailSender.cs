@@ -29,7 +29,7 @@ public class MailKitEmailSender : IEmailSender
             ? campaign.FromEmail
             : settings.OverrideFromAddress;
 
-        var message = new MimeMessage();
+        using var message = new MimeMessage();
         message.From.Add(new MailboxAddress(fromName, fromAddress));
         message.To.Add(MailboxAddress.Parse(toAddress));
         message.Subject = campaign.Subject;
@@ -72,15 +72,16 @@ public class MailKitEmailSender : IEmailSender
             _ => SecureSocketOptions.None
         };
 
-        await client.ConnectAsync(settings.Host, settings.Port, secureOption, cancellationToken);
+        await client.ConnectAsync(settings.Host, settings.Port, secureOption, cancellationToken).ConfigureAwait(false);
 
         if (!string.IsNullOrWhiteSpace(settings.Username))
         {
-            await client.AuthenticateAsync(settings.Username, settings.Password ?? string.Empty, cancellationToken);
+            await client.AuthenticateAsync(settings.Username, settings.Password ?? string.Empty, cancellationToken)
+                .ConfigureAwait(false);
         }
 
-        await client.SendAsync(message, cancellationToken);
-        await client.DisconnectAsync(true, cancellationToken);
+        await client.SendAsync(message, cancellationToken).ConfigureAwait(false);
+        await client.DisconnectAsync(true, cancellationToken).ConfigureAwait(false);
     }
 }
 
