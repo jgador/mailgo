@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, Menu } from 'electron';
 import path from 'path';
 import { getAppIcon, getFrontendEntry } from './config';
 import { startBackend, stopBackend } from './backend';
@@ -9,6 +9,9 @@ process.env.MAILGO_APP_VERSION = APP_VERSION;
 const createWindow = () => {
   const frontend = getFrontendEntry();
 
+  // Remove all default menus in the desktop shell.
+  Menu.setApplicationMenu(null);
+
   const win = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -17,7 +20,8 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false
-    }
+    },
+    autoHideMenuBar: true
   });
 
   if (frontend.isDev) {
