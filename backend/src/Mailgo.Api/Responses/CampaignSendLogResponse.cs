@@ -1,8 +1,8 @@
 using EmailMarketing.Domain.Enums;
 
-namespace EmailMarketing.Api.Dtos;
+namespace EmailMarketing.Api.Responses;
 
-public record CampaignSendLogDto(
+public record CampaignSendLogResponse(
     Guid Id,
     Guid CampaignId,
     Guid RecipientId,

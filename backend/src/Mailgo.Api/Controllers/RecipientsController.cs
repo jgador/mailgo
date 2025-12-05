@@ -3,7 +3,7 @@ using System.Net.Mail;
 using CsvHelper;
 using CsvHelper.Configuration;
 using EmailMarketing.Api.Data;
-using EmailMarketing.Api.Dtos;
+using EmailMarketing.Api.Responses;
 using EmailMarketing.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +15,7 @@ namespace EmailMarketing.Api.Controllers;
 public class RecipientsController(ApplicationDbContext dbContext) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<PagedResult<RecipientDto>>> GetRecipients(
+    public async Task<ActionResult<PagedResult<RecipientResponse>>> GetRecipients(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50,
         CancellationToken cancellationToken = default)
@@ -30,8 +30,8 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        var dto = new PagedResult<RecipientDto>(
-            items.Select(r => r.ToDto()).ToList(),
+        var dto = new PagedResult<RecipientResponse>(
+            items.Select(r => r.ToResponse()).ToList(),
             page,
             pageSize,
             totalItems,
@@ -42,7 +42,7 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
 
     [HttpPost("upload")]
     [RequestSizeLimit(10 * 1024 * 1024)]
-    public async Task<ActionResult<RecipientUploadResultDto>> UploadRecipients(
+    public async Task<ActionResult<RecipientUploadResultResponse>> UploadRecipients(
         IFormFile? file,
         CancellationToken cancellationToken = default)
     {
@@ -132,7 +132,7 @@ public class RecipientsController(ApplicationDbContext dbContext) : ControllerBa
             inserted = newRecipients.Count;
         }
 
-        var result = new RecipientUploadResultDto(totalRows, inserted, skipped);
+        var result = new RecipientUploadResultResponse(totalRows, inserted, skipped);
         return Ok(result);
     }
 

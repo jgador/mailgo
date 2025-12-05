@@ -1,10 +1,10 @@
 using EmailMarketing.Domain.Entities;
 
-namespace EmailMarketing.Api.Dtos;
+namespace EmailMarketing.Api.Responses;
 
-public static class DtoMapper
+public static class ResponseMapper
 {
-    public static RecipientDto ToDto(this Recipient recipient) =>
+    public static RecipientResponse ToResponse(this Recipient recipient) =>
         new(
             recipient.Id,
             recipient.Email,
@@ -12,7 +12,7 @@ public static class DtoMapper
             recipient.LastName,
             recipient.CreatedAt);
 
-    public static CampaignSummaryDto ToSummaryDto(
+    public static CampaignSummaryResponse ToSummaryResponse(
         this Campaign campaign,
         int totalRecipients,
         int sentCount,
@@ -30,7 +30,7 @@ public static class DtoMapper
             campaign.CreatedAt,
             campaign.LastUpdatedAt);
 
-    public static CampaignDetailDto ToDetailDto(
+    public static CampaignDetailResponse ToDetailResponse(
         this Campaign campaign,
         int totalRecipients,
         int sentCount,
@@ -50,7 +50,7 @@ public static class DtoMapper
             campaign.CreatedAt,
             campaign.LastUpdatedAt);
 
-    public static CampaignSendLogDto ToDto(this CampaignSendLog log) =>
+    public static CampaignSendLogResponse ToResponse(this CampaignSendLog log) =>
         new(
             log.Id,
             log.CampaignId,

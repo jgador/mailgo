@@ -1,5 +1,5 @@
 using EmailMarketing.Api.Data;
-using EmailMarketing.Api.Dtos;
+using EmailMarketing.Api.Responses;
 using EmailMarketing.Api.Requests;
 using EmailMarketing.Api.Services;
 using EmailMarketing.Domain.Entities;
@@ -18,7 +18,7 @@ public class CampaignsController(
     ILogger<CampaignsController> logger) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CampaignSummaryDto>>> GetCampaigns(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<CampaignSummaryResponse>>> GetCampaigns(CancellationToken cancellationToken)
     {
         var campaigns = await dbContext.Campaigns
             .AsNoTracking()
@@ -51,14 +51,14 @@ public class CampaignsController(
                 ? c.TargetRecipientCount
                 : (totalFromLogs > 0 ? totalFromLogs : recipientCount);
 
-            return c.ToSummaryDto(total, sent, failed);
+            return c.ToSummaryResponse(total, sent, failed);
         });
 
         return Ok(response);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<CampaignDetailDto>> GetCampaign(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<CampaignDetailResponse>> GetCampaign(Guid id, CancellationToken cancellationToken)
     {
         var campaign = await dbContext.Campaigns
             .AsNoTracking()
@@ -83,11 +83,11 @@ public class CampaignsController(
             ? campaign.TargetRecipientCount
             : (sent + failed > 0 ? sent + failed : await dbContext.Recipients.CountAsync(cancellationToken));
 
-        return Ok(campaign.ToDetailDto(total, sent, failed));
+        return Ok(campaign.ToDetailResponse(total, sent, failed));
     }
 
     [HttpGet("{id:guid}/logs")]
-    public async Task<ActionResult<IEnumerable<CampaignSendLogDto>>> GetLogs(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<CampaignSendLogResponse>>> GetLogs(Guid id, CancellationToken cancellationToken)
     {
         var exists = await dbContext.Campaigns.AnyAsync(c => c.Id == id, cancellationToken);
         if (!exists)
@@ -102,11 +102,11 @@ public class CampaignsController(
             .OrderByDescending(l => l.SentAt ?? DateTime.MinValue)
             .ToListAsync(cancellationToken);
 
-        return Ok(logs.Select(l => l.ToDto()));
+        return Ok(logs.Select(l => l.ToResponse()));
     }
 
     [HttpPost]
-    public async Task<ActionResult<CampaignDetailDto>> CreateCampaign(
+    public async Task<ActionResult<CampaignDetailResponse>> CreateCampaign(
         CampaignUpsertRequest request,
         CancellationToken cancellationToken)
     {
@@ -127,13 +127,13 @@ public class CampaignsController(
         await dbContext.SaveChangesAsync(cancellationToken);
 
         var recipients = await dbContext.Recipients.CountAsync(cancellationToken);
-        var dto = campaign.ToDetailDto(recipients, 0, 0);
+        var dto = campaign.ToDetailResponse(recipients, 0, 0);
 
         return CreatedAtAction(nameof(GetCampaign), new { id = campaign.Id }, dto);
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<CampaignDetailDto>> UpdateCampaign(
+    public async Task<ActionResult<CampaignDetailResponse>> UpdateCampaign(
         Guid id,
         CampaignUpsertRequest request,
         CancellationToken cancellationToken)
@@ -169,7 +169,7 @@ public class CampaignsController(
             ? campaign.TargetRecipientCount
             : (sent + failed > 0 ? sent + failed : await dbContext.Recipients.CountAsync(cancellationToken));
 
-        return Ok(campaign.ToDetailDto(total, sent, failed));
+        return Ok(campaign.ToDetailResponse(total, sent, failed));
     }
 
     [HttpPost("{id:guid}/send-test")]

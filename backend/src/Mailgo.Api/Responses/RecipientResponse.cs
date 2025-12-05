@@ -1,6 +1,6 @@
-namespace EmailMarketing.Api.Dtos;
+namespace EmailMarketing.Api.Responses;
 
-public record RecipientDto(
+public record RecipientResponse(
     Guid Id,
     string Email,
     string? FirstName,

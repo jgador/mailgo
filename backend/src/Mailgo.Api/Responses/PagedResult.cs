@@ -1,4 +1,4 @@
-namespace EmailMarketing.Api.Dtos;
+namespace EmailMarketing.Api.Responses;
 
 public record PagedResult<T>(
     IReadOnlyCollection<T> Items,
