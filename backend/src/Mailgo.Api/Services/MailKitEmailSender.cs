@@ -1,3 +1,6 @@
+// Licensed under the MIT License.
+// See the LICENSE file in the project root for full license information.
+
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Mailgo.Api.Enums;

@@ -1,6 +1,9 @@
+// Licensed under the MIT License.
+// See the LICENSE file in the project root for full license information.
+
 using Mailgo.Api.Data;
-using Mailgo.Api.Responses;
 using Mailgo.Api.Requests;
+using Mailgo.Api.Responses;
 using Mailgo.Api.Services;
 using Mailgo.Domain.Entities;
 using Mailgo.Domain.Enums;

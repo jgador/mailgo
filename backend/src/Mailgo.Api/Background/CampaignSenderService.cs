@@ -1,10 +1,11 @@
+// Licensed under the MIT License.
+// See the LICENSE file in the project root for full license information.
+
 using Mailgo.Api.Data;
 using Mailgo.Api.Services;
 using Mailgo.Domain.Entities;
 using Mailgo.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace Mailgo.Api.Background;
 
