@@ -1,10 +1,17 @@
 // Licensed under the MIT License.
 // See the LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Mailgo.Api.Services;
 using Mailgo.Api.Stores;
 using Mailgo.Domain.Entities;
 using Mailgo.Domain.Enums;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Mailgo.Api.Background;
 

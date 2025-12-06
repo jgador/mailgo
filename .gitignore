@@ -285,6 +285,7 @@ ServiceFabricBackup/
 # SQLite journaling files
 *.db-shm
 *.db-wal
+data/app.db
 
 # Business Intelligence projects
 *.rdl.data

@@ -1,8 +1,11 @@
 // Licensed under the MIT License.
 // See the LICENSE file in the project root for full license information.
 
+using System;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
 using Mailgo.Api.Enums;
 using Mailgo.Domain.Entities;
 using MailKit.Net.Smtp;

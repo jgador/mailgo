@@ -1,12 +1,18 @@
 // Licensed under the MIT License.
 // See the LICENSE file in the project root for full license information.
 
+using System;
+using System.IO;
 using System.Text.Json.Serialization;
 using Mailgo.Api.Background;
 using Mailgo.Api.Data;
 using Mailgo.Api.Services;
 using Mailgo.Api.Stores;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 public partial class Program
 {
