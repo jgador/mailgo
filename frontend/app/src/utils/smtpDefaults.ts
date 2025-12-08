@@ -7,7 +7,6 @@ export interface SmtpDefaults {
   port: number;
   username?: string;
   encryption: EncryptionType;
-  encryptionHostname?: string;
   allowSelfSigned: boolean;
   overrideFromName?: string;
   overrideFromAddress?: string;
@@ -18,7 +17,6 @@ const defaultValues: SmtpDefaults = {
   port: 587,
   username: '',
   encryption: EncryptionType.StartTls,
-  encryptionHostname: '',
   allowSelfSigned: false,
   overrideFromName: '',
   overrideFromAddress: '',

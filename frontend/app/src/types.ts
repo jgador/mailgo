@@ -58,8 +58,9 @@ export interface SmtpSettings {
   smtpPort: number;
   smtpUsername?: string;
   smtpPassword?: string;
+  smtpPasswordEncrypted?: string;
+  smtpPasswordKeyId?: string;
   encryption: EncryptionType;
-  encryptionHostname?: string;
   allowSelfSigned?: boolean;
   overrideFromName?: string;
   overrideFromAddress?: string;
@@ -86,4 +87,9 @@ export interface PagedResult<T> {
   pageSize: number;
   totalItems: number;
   totalPages: number;
+}
+
+export interface SmtpPublicKey {
+  keyId: string;
+  publicKeyPem: string;
 }

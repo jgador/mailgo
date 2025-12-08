@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { EncryptionType } from '../types';
+import { EncryptionType, SmtpPublicKey } from '../types';
+import { securityService } from '../services/api';
+import { encryptWithPublicKey } from '../utils/crypto';
+import {
+  isSessionPasswordCompatible,
+  loadSessionPassword,
+  saveSessionPassword,
+  SessionPasswordCache,
+} from '../utils/sessionPassword';
 import {
   loadSmtpDefaults,
   saveSmtpDefaults,
@@ -9,15 +17,42 @@ import {
 } from '../utils/smtpDefaults';
 
 const SettingsPage: React.FC = () => {
-  const [form, setForm] = useState<SmtpDefaults>(loadSmtpDefaults());
+  const [form, setForm] = useState<SmtpDefaults>(() => loadSmtpDefaults());
+  const [portInput, setPortInput] = useState<string>(() => String(loadSmtpDefaults().port));
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [password, setPassword] = useState('');
+  const [encryptedPassword, setEncryptedPassword] = useState<SessionPasswordCache | null>(null);
+  const [smtpKey, setSmtpKey] = useState<SmtpPublicKey | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    setForm(loadSmtpDefaults());
+    const defaults = loadSmtpDefaults();
+    const sanitized = { ...defaults, allowSelfSigned: false, overrideFromAddress: '' };
+    setForm(sanitized);
+    setPortInput(String(sanitized.port));
     setPassword('');
+    setPasswordError(null);
+    const cached = loadSessionPassword();
+    const abortController = new AbortController();
+    securityService
+      .getSmtpKey()
+      .then((key) => {
+        if (abortController.signal.aborted) return;
+        setSmtpKey(key);
+        if (isSessionPasswordCompatible(cached, key.keyId)) {
+          setEncryptedPassword(cached);
+        } else {
+          saveSessionPassword(null);
+        }
+      })
+      .catch((err) => {
+        if (abortController.signal.aborted) return;
+        console.error('Failed to load SMTP encryption key', err);
+        setPasswordError('Unable to load encryption key. Password will not be cached.');
+      });
     setShowPassword(false);
+    return () => abortController.abort();
   }, []);
 
   const handleChange = <K extends keyof SmtpDefaults>(key: K, value: SmtpDefaults[K]) => {
@@ -31,7 +66,9 @@ const SettingsPage: React.FC = () => {
     e.preventDefault();
     setStatus('saving');
     try {
-      saveSmtpDefaults(form);
+      const sanitized = { ...form, overrideFromAddress: '' };
+      setForm(sanitized);
+      saveSmtpDefaults(sanitized);
       setStatus('saved');
       setTimeout(() => setStatus('idle'), 2500);
     } catch (err) {
@@ -40,11 +77,45 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handlePasswordChange = async (value: string) => {
+    setPassword(value);
+    setPasswordError(null);
+    if (!value) {
+      setEncryptedPassword(null);
+      saveSessionPassword(null);
+      return;
+    }
+    if (!smtpKey) {
+      setPasswordError('Encryption key unavailable.');
+      return;
+    }
+    try {
+      const cipherText = await encryptWithPublicKey(smtpKey.publicKeyPem, value);
+      const payload = { cipherText, keyId: smtpKey.keyId };
+      setEncryptedPassword(payload);
+      saveSessionPassword(payload);
+    } catch (err) {
+      console.error('Failed to encrypt password', err);
+      setPasswordError('Unable to encrypt password. Please retry.');
+    }
+  };
+
+  const handlePortChange = (value: string) => {
+    const numericValue = value.replace(/\D/g, '');
+    setPortInput(numericValue);
+    if (numericValue) {
+      handleChange('port', Number(numericValue));
+    }
+  };
+
   const handleReset = () => {
     clearSmtpDefaults();
     const defaults = loadSmtpDefaults();
-    setForm(defaults);
+    setForm({ ...defaults, port: 0, allowSelfSigned: false, overrideFromAddress: '' });
+    setPortInput('');
     setPassword('');
+    setEncryptedPassword(null);
+    saveSessionPassword(null);
     setShowPassword(false);
     setStatus('idle');
   };
@@ -54,7 +125,7 @@ const SettingsPage: React.FC = () => {
       <div>
         <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
         <p className="text-sm text-gray-600 mt-1">
-          Configure default SMTP details used to pre-fill the send dialogs. Passwords are never persisted.
+          Configure default SMTP details used to pre-fill the send dialogs. Passwords are encrypted for this browser session only.
         </p>
       </div>
 
@@ -88,11 +159,12 @@ const SettingsPage: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Port</label>
             <input
-              type="number"
-              min={1}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               required
-              value={form.port}
-              onChange={(e) => handleChange('port', Number(e.target.value))}
+              value={portInput}
+              onChange={(e) => handlePortChange(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="587"
             />
@@ -126,13 +198,13 @@ const SettingsPage: React.FC = () => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Password (not saved)
+            Password (session only)
           </label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => handlePasswordChange(e.target.value)}
               className="w-full pr-11 pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="Only used when sending"
               autoComplete="new-password"
@@ -147,60 +219,25 @@ const SettingsPage: React.FC = () => {
             </button>
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            This field is cleared every visit and never stored with your defaults.
+            Encrypted with key {smtpKey?.keyId ?? 'loading...'} and stored in session storage; clears when the tab or app closes.
           </p>
+          {encryptedPassword && (
+            <p className="text-xs text-green-600 mt-1">Password cached for this session.</p>
+          )}
+          {passwordError && <p className="text-xs text-red-600 mt-1">{passwordError}</p>}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Encryption Hostname (optional)
-            </label>
-            <input
-              type="text"
-              value={form.encryptionHostname || ''}
-              onChange={(e) => handleChange('encryptionHostname', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
-              placeholder="mail.example.com"
-            />
-          </div>
-          <div className="flex items-center gap-3 pt-6">
-            <input
-              id="allowSelfSigned"
-              type="checkbox"
-              checked={form.allowSelfSigned}
-              onChange={(e) => handleChange('allowSelfSigned', e.target.checked)}
-              className="w-4 h-4 text-brand-blue border-gray-300 rounded"
-            />
-            <label htmlFor="allowSelfSigned" className="text-sm text-gray-700">
-              Allow self-signed certificates
-            </label>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Default From Name (optional)
-            </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Default From Name (optional)
+              </label>
             <input
               type="text"
               value={form.overrideFromName || ''}
               onChange={(e) => handleChange('overrideFromName', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
               placeholder="MailGo"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Default From Email (optional)
-            </label>
-            <input
-              type="email"
-              value={form.overrideFromAddress || ''}
-              onChange={(e) => handleChange('overrideFromAddress', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
-              placeholder="no-reply@example.com"
             />
           </div>
         </div>
@@ -223,7 +260,7 @@ const SettingsPage: React.FC = () => {
         </div>
 
         <p className="text-xs text-gray-500">
-          Passwords remain ephemeral and must be provided when launching a test or production send.
+          Passwords are encrypted in session storage and clear when the tab or app closes; they are not saved with your defaults.
         </p>
       </form>
     </div>

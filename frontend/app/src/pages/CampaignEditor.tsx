@@ -69,7 +69,7 @@ const CampaignEditor: React.FC = () => {
 
   const ensureRequiredFields = () => {
     if (!formData.name || !formData.subject || !formData.fromEmail) {
-      alert('Please fill in required fields (Name, Subject, From Email)');
+      alert('Please fill in required fields (Name, Subject, Sender Email)');
       return false;
     }
     return true;
@@ -258,7 +258,7 @@ const CampaignEditor: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">From Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Sender Name</label>
                         <input
                             type="text"
                             name="fromName"
@@ -270,7 +270,7 @@ const CampaignEditor: React.FC = () => {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">From Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Sender Email</label>
                         <input
                             type="email"
                             name="fromEmail"
@@ -369,6 +369,10 @@ const CampaignEditor: React.FC = () => {
         onSubmit={handleSendNow}
         isTest={false}
         title="Send Campaign Now"
+        summaryCampaignName={formData.name}
+        summarySubject={formData.subject}
+        summaryFromName={formData.fromName}
+        summaryFromEmail={formData.fromEmail}
       />
     </div>
   );

@@ -21,6 +21,7 @@ public class CampaignsController(
     CampaignStore campaignStore,
     ICampaignSendSessionStore sessionStore,
     IEmailSender emailSender,
+    ISmtpPasswordDecryptor passwordDecryptor,
     ILogger<CampaignsController> logger) : ControllerBase
 {
     [HttpGet]
@@ -106,9 +107,16 @@ public class CampaignsController(
 
         try
         {
-            await emailSender.SendAsync(campaign, tempRecipient, request.ToSettings(), cancellationToken, request.TestEmail)
+            var smtpSettings = await request.ToSettingsAsync(passwordDecryptor, cancellationToken).ConfigureAwait(false);
+
+            await emailSender.SendAsync(campaign, tempRecipient, smtpSettings, cancellationToken, request.TestEmail)
                 .ConfigureAwait(false);
             return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogWarning(ex, "Invalid SMTP password payload for campaign {CampaignId}", campaign.Id);
+            return BadRequest("Invalid SMTP password payload.");
         }
         catch (Exception ex)
         {
@@ -135,7 +143,17 @@ public class CampaignsController(
         }
 
         var campaign = result.Campaign!;
-        sessionStore.Upsert(new CampaignSendSession(campaign.Id, request.ToSettings(), DateTime.UtcNow));
+        try
+        {
+            var smtpSettings = await request.ToSettingsAsync(passwordDecryptor, cancellationToken).ConfigureAwait(false);
+            sessionStore.Upsert(new CampaignSendSession(campaign.Id, smtpSettings, DateTime.UtcNow));
+        }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogWarning(ex, "Invalid SMTP password payload for campaign {CampaignId}", campaign.Id);
+            return BadRequest("Invalid SMTP password payload.");
+        }
+
         logger.LogInformation(
             "Campaign {CampaignId} queued for sending to {RecipientCount} recipients",
             campaign.Id,

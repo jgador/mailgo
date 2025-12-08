@@ -10,6 +10,7 @@ import {
   RecipientUploadResult,
   SendNowRequest,
   SendTestRequest,
+  SmtpPublicKey,
 } from '../types';
 
 const api = axios.create({
@@ -61,6 +62,13 @@ export const campaignService = {
   },
   getLogs: async (id: string): Promise<CampaignSendLog[]> => {
     const response = await api.get<CampaignSendLog[]>(`/campaigns/${id}/logs`);
+    return response.data;
+  },
+};
+
+export const securityService = {
+  getSmtpKey: async (): Promise<SmtpPublicKey> => {
+    const response = await api.get<SmtpPublicKey>('/keys/smtp');
     return response.data;
   },
 };
