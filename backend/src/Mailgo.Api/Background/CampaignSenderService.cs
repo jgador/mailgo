@@ -45,7 +45,7 @@ public class CampaignSenderService(
                 if (!sessionStore.TryGet(campaign.Id, out var session) || session is null)
                 {
                     logger.LogWarning("Missing SMTP session for campaign {CampaignId}. Marking as failed.", campaign.Id);
-                    await campaignStore.MarkCampaignAsFailedAsync(campaign, stoppingToken).ConfigureAwait(false);
+                    await campaignStore.MarkCampaignAsFailedAsync(campaign.Id, stoppingToken).ConfigureAwait(false);
                     continue;
                 }
 
@@ -80,7 +80,7 @@ public class CampaignSenderService(
 
         if (pendingRecipients.Count == 0)
         {
-            await campaignStore.FinalizeCampaignAsync(campaign, cancellationToken).ConfigureAwait(false);
+            await campaignStore.FinalizeCampaignAsync(campaign.Id, cancellationToken).ConfigureAwait(false);
             sessionStore.Remove(campaign.Id);
             return true;
         }
@@ -111,9 +111,7 @@ public class CampaignSenderService(
             logs.Add(log);
         }
 
-        await campaignStore.AddSendLogsAsync(logs, cancellationToken).ConfigureAwait(false);
-        campaign.LastUpdatedAt = DateTime.UtcNow;
-        await campaignStore.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await campaignStore.AddSendLogsAsync(campaign.Id, logs, cancellationToken).ConfigureAwait(false);
 
         return false;
     }

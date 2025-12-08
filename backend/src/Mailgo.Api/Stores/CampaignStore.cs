@@ -17,13 +17,16 @@ namespace Mailgo.Api.Stores;
 
 public class CampaignStore
 {
-    private readonly ApplicationDbContext _dbContext;
+    private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
 
-    public CampaignStore(ApplicationDbContext dbContext) => _dbContext = dbContext;
+    public CampaignStore(IDbContextFactory<ApplicationDbContext> dbContextFactory) =>
+        _dbContextFactory = dbContextFactory;
 
     public async Task<IReadOnlyCollection<CampaignSummaryResponse>> GetSummariesAsync(CancellationToken cancellationToken)
     {
-        var campaigns = await _dbContext.Campaigns
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        var campaigns = await dbContext.Campaigns
             .AsNoTracking()
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(cancellationToken)
@@ -36,7 +39,7 @@ public class CampaignStore
 
         var campaignIds = campaigns.Select(c => c.Id).ToList();
 
-        var statsLookup = await _dbContext.CampaignSendLogs
+        var statsLookup = await dbContext.CampaignSendLogs
             .AsNoTracking()
             .Where(l => campaignIds.Contains(l.CampaignId))
             .GroupBy(l => l.CampaignId)
@@ -49,7 +52,7 @@ public class CampaignStore
             .ToDictionaryAsync(x => x.CampaignId, cancellationToken)
             .ConfigureAwait(false);
 
-        var fallbackRecipientCount = await _dbContext.Recipients.CountAsync(cancellationToken).ConfigureAwait(false);
+        var fallbackRecipientCount = await dbContext.Recipients.CountAsync(cancellationToken).ConfigureAwait(false);
 
         return campaigns
             .Select(c =>
@@ -65,7 +68,9 @@ public class CampaignStore
 
     public async Task<CampaignDetailResponse?> GetDetailAsync(Guid id, CancellationToken cancellationToken)
     {
-        var campaign = await _dbContext.Campaigns
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        var campaign = await dbContext.Campaigns
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
             .ConfigureAwait(false);
@@ -75,21 +80,26 @@ public class CampaignStore
             return null;
         }
 
-        var (sent, failed) = await GetSendStatsAsync(id, cancellationToken).ConfigureAwait(false);
-        var total = await ResolveDetailTotalAsync(campaign, sent, failed, cancellationToken).ConfigureAwait(false);
+        var (sent, failed) = await GetSendStatsAsync(dbContext, id, cancellationToken).ConfigureAwait(false);
+        var total = await ResolveDetailTotalAsync(dbContext, campaign, sent, failed, cancellationToken).ConfigureAwait(false);
 
         return campaign.ToDetailResponse(total, sent, failed);
     }
 
     public async Task<IReadOnlyCollection<CampaignSendLogResponse>?> GetLogsAsync(Guid id, CancellationToken cancellationToken)
     {
-        var exists = await _dbContext.Campaigns.AnyAsync(c => c.Id == id, cancellationToken).ConfigureAwait(false);
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        var exists = await dbContext.Campaigns
+            .AsNoTracking()
+            .AnyAsync(c => c.Id == id, cancellationToken)
+            .ConfigureAwait(false);
         if (!exists)
         {
             return null;
         }
 
-        var logs = await _dbContext.CampaignSendLogs
+        var logs = await dbContext.CampaignSendLogs
             .AsNoTracking()
             .Include(l => l.Recipient)
             .Where(l => l.CampaignId == id)
@@ -114,16 +124,19 @@ public class CampaignStore
             LastUpdatedAt = DateTime.UtcNow
         };
 
-        _dbContext.Campaigns.Add(campaign);
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        dbContext.Campaigns.Add(campaign);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        var recipients = await _dbContext.Recipients.CountAsync(cancellationToken).ConfigureAwait(false);
+        var recipients = await dbContext.Recipients.CountAsync(cancellationToken).ConfigureAwait(false);
         return campaign.ToDetailResponse(recipients, 0, 0);
     }
 
     public async Task<UpdateCampaignResult> UpdateCampaignAsync(Guid id, CampaignUpsertRequest request, CancellationToken cancellationToken)
     {
-        var campaign = await _dbContext.Campaigns.FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        var campaign = await dbContext.Campaigns.FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
             .ConfigureAwait(false);
         if (campaign is null)
         {
@@ -142,23 +155,29 @@ public class CampaignStore
         campaign.HtmlBody = request.HtmlBody;
         campaign.LastUpdatedAt = DateTime.UtcNow;
 
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        var (sent, failed) = await GetSendStatsAsync(id, cancellationToken).ConfigureAwait(false);
-        var total = await ResolveDetailTotalAsync(campaign, sent, failed, cancellationToken).ConfigureAwait(false);
+        var (sent, failed) = await GetSendStatsAsync(dbContext, id, cancellationToken).ConfigureAwait(false);
+        var total = await ResolveDetailTotalAsync(dbContext, campaign, sent, failed, cancellationToken).ConfigureAwait(false);
 
         return UpdateCampaignResult.CreateSuccess(campaign.ToDetailResponse(total, sent, failed));
     }
 
-    public async Task<Campaign?> GetCampaignAsync(Guid id, CancellationToken cancellationToken) =>
-        await _dbContext.Campaigns
+    public async Task<Campaign?> GetCampaignAsync(Guid id, CancellationToken cancellationToken)
+    {
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        return await dbContext.Campaigns
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
             .ConfigureAwait(false);
+    }
 
     public async Task<SendNowPreparationResult> PrepareSendNowAsync(Guid id, CancellationToken cancellationToken)
     {
-        var campaign = await _dbContext.Campaigns.FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        var campaign = await dbContext.Campaigns.FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
             .ConfigureAwait(false);
         if (campaign is null)
         {
@@ -170,7 +189,7 @@ public class CampaignStore
             return SendNowPreparationResult.CreateInvalid("Only draft campaigns can be sent.");
         }
 
-        var recipientCount = await _dbContext.Recipients.CountAsync(cancellationToken).ConfigureAwait(false);
+        var recipientCount = await dbContext.Recipients.CountAsync(cancellationToken).ConfigureAwait(false);
         if (recipientCount == 0)
         {
             return SendNowPreparationResult.CreateInvalid("Upload recipients before sending.");
@@ -180,50 +199,92 @@ public class CampaignStore
         campaign.TargetRecipientCount = recipientCount;
         campaign.LastUpdatedAt = DateTime.UtcNow;
 
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return SendNowPreparationResult.CreateSuccess(campaign, recipientCount);
     }
 
-    public async Task<Campaign?> GetNextSendingCampaignAsync(CancellationToken cancellationToken) =>
-        await _dbContext.Campaigns
+    public async Task<Campaign?> GetNextSendingCampaignAsync(CancellationToken cancellationToken)
+    {
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        return await dbContext.Campaigns
+            .AsNoTracking()
             .Where(c => c.Status == CampaignStatus.Sending)
             .OrderBy(c => c.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
+    }
 
-    public async Task MarkCampaignAsFailedAsync(Campaign campaign, CancellationToken cancellationToken)
+    public async Task MarkCampaignAsFailedAsync(Guid campaignId, CancellationToken cancellationToken)
     {
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        var campaign = await dbContext.Campaigns.FirstOrDefaultAsync(c => c.Id == campaignId, cancellationToken)
+            .ConfigureAwait(false);
+        if (campaign is null)
+        {
+            return;
+        }
+
         campaign.Status = CampaignStatus.Failed;
         campaign.LastUpdatedAt = DateTime.UtcNow;
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<IReadOnlyCollection<Recipient>> GetPendingRecipientsAsync(
         Guid campaignId,
         int batchSize,
-        CancellationToken cancellationToken) =>
-        await _dbContext.Recipients
-            .Where(r => !_dbContext.CampaignSendLogs.Any(l => l.CampaignId == campaignId && l.RecipientId == r.Id))
+        CancellationToken cancellationToken)
+    {
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        return await dbContext.Recipients
+            .AsNoTracking()
+            .Where(r => !dbContext.CampaignSendLogs.Any(l => l.CampaignId == campaignId && l.RecipientId == r.Id))
             .OrderBy(r => r.CreatedAt)
             .Take(batchSize)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
-
-    public async Task AddSendLogsAsync(IEnumerable<CampaignSendLog> logs, CancellationToken cancellationToken)
-    {
-        await _dbContext.CampaignSendLogs.AddRangeAsync(logs, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task SaveChangesAsync(CancellationToken cancellationToken) =>
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-    public async Task FinalizeCampaignAsync(Campaign campaign, CancellationToken cancellationToken)
+    public async Task AddSendLogsAsync(
+        Guid campaignId,
+        IEnumerable<CampaignSendLog> logs,
+        CancellationToken cancellationToken)
     {
-        var (sent, failed) = await GetSendStatsAsync(campaign.Id, cancellationToken).ConfigureAwait(false);
+        var logList = logs.ToList();
+        if (logList.Count == 0)
+        {
+            return;
+        }
+
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        await dbContext.CampaignSendLogs.AddRangeAsync(logList, cancellationToken).ConfigureAwait(false);
+
+        var campaign = await dbContext.Campaigns.FirstOrDefaultAsync(c => c.Id == campaignId, cancellationToken)
+            .ConfigureAwait(false);
+        campaign?.LastUpdatedAt = DateTime.UtcNow;
+
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task FinalizeCampaignAsync(Guid campaignId, CancellationToken cancellationToken)
+    {
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        var campaign = await dbContext.Campaigns.FirstOrDefaultAsync(c => c.Id == campaignId, cancellationToken)
+            .ConfigureAwait(false);
+        if (campaign is null)
+        {
+            return;
+        }
+
+        var (sent, failed) = await GetSendStatsAsync(dbContext, campaignId, cancellationToken).ConfigureAwait(false);
         campaign.Status = failed > 0 ? CampaignStatus.Failed : CampaignStatus.Completed;
         campaign.LastUpdatedAt = DateTime.UtcNow;
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private static int ResolveTotalRecipients(Campaign campaign, int sent, int failed, int fallbackRecipientCount)
@@ -242,7 +303,12 @@ public class CampaignStore
         return fallbackRecipientCount;
     }
 
-    private async Task<int> ResolveDetailTotalAsync(Campaign campaign, int sent, int failed, CancellationToken cancellationToken)
+    private static async Task<int> ResolveDetailTotalAsync(
+        ApplicationDbContext dbContext,
+        Campaign campaign,
+        int sent,
+        int failed,
+        CancellationToken cancellationToken)
     {
         if (campaign.TargetRecipientCount > 0)
         {
@@ -255,18 +321,21 @@ public class CampaignStore
             return totalFromLogs;
         }
 
-        return await _dbContext.Recipients.CountAsync(cancellationToken).ConfigureAwait(false);
+        return await dbContext.Recipients.CountAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task<(int sent, int failed)> GetSendStatsAsync(Guid campaignId, CancellationToken cancellationToken)
+    private static async Task<(int sent, int failed)> GetSendStatsAsync(
+        ApplicationDbContext dbContext,
+        Guid campaignId,
+        CancellationToken cancellationToken)
     {
-        var sent = await _dbContext.CampaignSendLogs
+        var sent = await dbContext.CampaignSendLogs
             .AsNoTracking()
             .Where(l => l.CampaignId == campaignId && l.Status == CampaignSendStatus.Sent)
             .CountAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        var failed = await _dbContext.CampaignSendLogs
+        var failed = await dbContext.CampaignSendLogs
             .AsNoTracking()
             .Where(l => l.CampaignId == campaignId && l.Status == CampaignSendStatus.Failed)
             .CountAsync(cancellationToken)

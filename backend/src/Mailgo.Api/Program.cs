@@ -27,7 +27,7 @@ public partial class Program
         var connectionString = builder.Configuration.GetConnectionString("Default")
                                 ?? $"Data Source={Path.Combine(dataDirectory, "app.db")}";
 
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
             options.UseSqlite(connectionString));
 
         builder.Services.Configure<SmtpEncryptionKeyOptions>(builder.Configuration.GetSection(SmtpEncryptionKeyOptions.SectionName));
@@ -59,11 +59,10 @@ public partial class Program
 
         var app = builder.Build();
 
-        using (var scope = app.Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            dbContext.Database.Migrate();
-        }
+        using var scope = app.Services.CreateScope();
+        var dbContextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+        using var dbContext = dbContextFactory.CreateDbContext();
+        dbContext.Database.Migrate();
 
         if (app.Environment.IsDevelopment())
         {

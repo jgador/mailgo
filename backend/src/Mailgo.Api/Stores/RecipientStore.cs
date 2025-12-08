@@ -15,13 +15,16 @@ namespace Mailgo.Api.Stores;
 
 public class RecipientStore
 {
-    private readonly ApplicationDbContext _dbContext;
+    private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
 
-    public RecipientStore(ApplicationDbContext dbContext) => _dbContext = dbContext;
+    public RecipientStore(IDbContextFactory<ApplicationDbContext> dbContextFactory) =>
+        _dbContextFactory = dbContextFactory;
 
     public async Task<PagedResult<RecipientResponse>> GetRecipientsAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
-        var query = _dbContext.Recipients.AsNoTracking().OrderByDescending(r => r.CreatedAt);
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        var query = dbContext.Recipients.AsNoTracking().OrderByDescending(r => r.CreatedAt);
         var totalItems = await query.CountAsync(cancellationToken).ConfigureAwait(false);
         var items = await query
             .Skip((page - 1) * pageSize)
@@ -39,7 +42,9 @@ public class RecipientStore
 
     public async Task<HashSet<string>> GetExistingRecipientEmailsAsync(CancellationToken cancellationToken)
     {
-        var emails = await _dbContext.Recipients
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        var emails = await dbContext.Recipients
             .AsNoTracking()
             .Select(r => r.Email.ToLowerInvariant())
             .ToListAsync(cancellationToken)
@@ -56,8 +61,10 @@ public class RecipientStore
             return 0;
         }
 
-        await _dbContext.Recipients.AddRangeAsync(list, cancellationToken).ConfigureAwait(false);
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+        await dbContext.Recipients.AddRangeAsync(list, cancellationToken).ConfigureAwait(false);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return list.Count;
     }
