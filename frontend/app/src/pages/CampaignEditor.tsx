@@ -72,6 +72,11 @@ const CampaignEditor: React.FC = () => {
       alert('Please fill in required fields (Name, Subject, Sender Email)');
       return false;
     }
+    const textBody = formData.textBody ?? '';
+    if (!formData.htmlBody.trim() && !textBody.trim()) {
+      alert('Provide either HTML Body or Text Fallback before sending.');
+      return false;
+    }
     return true;
   };
 
@@ -134,6 +139,8 @@ const CampaignEditor: React.FC = () => {
         smtpPort: settings.smtpPort,
         smtpUsername: settings.smtpUsername,
         smtpPassword: settings.smtpPassword,
+        smtpPasswordEncrypted: (settings as SendNowRequest).smtpPasswordEncrypted,
+        smtpPasswordKeyId: (settings as SendNowRequest).smtpPasswordKeyId,
         encryption: settings.encryption,
      };
      await campaignService.sendNow(currentId, payload);
@@ -266,7 +273,7 @@ const CampaignEditor: React.FC = () => {
                             onChange={handleChange}
                             disabled={isReadOnly}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
-                            placeholder="John Doe"
+                            placeholder="Juan dela Cruz"
                         />
                     </div>
                     <div>
@@ -278,7 +285,7 @@ const CampaignEditor: React.FC = () => {
                             onChange={handleChange}
                             disabled={isReadOnly}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
-                            placeholder="john@example.com"
+                            placeholder="juan@mailgo.com"
                         />
                     </div>
                 </div>
@@ -286,7 +293,7 @@ const CampaignEditor: React.FC = () => {
                 <div className="pt-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
                         <span>HTML Body</span>
-                        <span className="text-xs text-gray-400 font-normal">HTML supported</span>
+                        <span className="text-xs text-gray-400 font-normal">HTML supported (or leave blank if using text)</span>
                     </label>
                     <textarea
                         name="htmlBody"
@@ -300,7 +307,7 @@ const CampaignEditor: React.FC = () => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Text Fallback (Optional)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Text Body (optional if HTML is provided)</label>
                     <textarea
                         name="textBody"
                         value={formData.textBody}
@@ -344,9 +351,13 @@ const CampaignEditor: React.FC = () => {
                                 className="w-full h-[600px] border-none"
                                 sandbox="allow-same-origin" 
                             />
+                        ) : formData.textBody ? (
+                            <pre className="text-sm text-gray-800 whitespace-pre-wrap break-words bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                {formData.textBody}
+                            </pre>
                         ) : (
                             <div className="text-gray-300 text-center py-20 italic">
-                                Start typing HTML content to see a preview...
+                                Start typing HTML or Text content to see a preview...
                             </div>
                         )}
                     </div>

@@ -1,12 +1,13 @@
 // Licensed under the MIT License.
 // See the LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Mailgo.Api.Requests;
 
-public class CampaignUpsertRequest
+public class CampaignUpsertRequest : IValidatableObject
 {
     [Required, MaxLength(256)]
     [JsonPropertyName("name")]
@@ -24,11 +25,20 @@ public class CampaignUpsertRequest
     [JsonPropertyName("fromEmail")]
     public string FromEmail { get; set; } = string.Empty;
 
-    [Required]
     [JsonPropertyName("htmlBody")]
     public string HtmlBody { get; set; } = string.Empty;
 
     [JsonPropertyName("textBody")]
     public string? TextBody { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (string.IsNullOrWhiteSpace(HtmlBody) && string.IsNullOrWhiteSpace(TextBody))
+        {
+            yield return new ValidationResult(
+                "Either HTML Body or Text Body is required.",
+                new[] { nameof(HtmlBody), nameof(TextBody) });
+        }
+    }
 }
 
