@@ -45,7 +45,6 @@ public static class ResponseMapper
             campaign.FromName,
             campaign.FromEmail,
             campaign.HtmlBody,
-            campaign.TextBody,
             campaign.Status,
             totalRecipients,
             sentCount,

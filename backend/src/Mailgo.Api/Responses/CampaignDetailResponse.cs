@@ -16,7 +16,6 @@ public class CampaignDetailResponse
         string fromName,
         string fromEmail,
         string htmlBody,
-        string? textBody,
         CampaignStatus status,
         int totalRecipients,
         int sentCount,
@@ -30,7 +29,6 @@ public class CampaignDetailResponse
         FromName = fromName;
         FromEmail = fromEmail;
         HtmlBody = htmlBody;
-        TextBody = textBody;
         Status = status;
         TotalRecipients = totalRecipients;
         SentCount = sentCount;
@@ -56,9 +54,6 @@ public class CampaignDetailResponse
 
     [JsonPropertyName("htmlBody")]
     public string HtmlBody { get; }
-
-    [JsonPropertyName("textBody")]
-    public string? TextBody { get; }
 
     [JsonPropertyName("status")]
     public CampaignStatus Status { get; }

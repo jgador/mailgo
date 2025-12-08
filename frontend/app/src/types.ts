@@ -78,7 +78,6 @@ export interface CreateCampaignRequest {
   fromName: string;
   fromEmail: string;
   htmlBody: string;
-  textBody?: string;
 }
 
 export interface PagedResult<T> {

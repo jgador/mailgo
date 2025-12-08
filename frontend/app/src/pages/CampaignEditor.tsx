@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { campaignService } from '../services/api';
 import { CampaignStatus, CreateCampaignRequest, SendNowRequest, SendTestRequest } from '../types';
 import SmtpModal from '../components/SmtpModal';
+import RichTextEditor from '../components/RichTextEditor';
 import { Save, Send, Eye, Monitor, ChevronLeft } from 'lucide-react';
 
 const CampaignEditor: React.FC = () => {
@@ -17,7 +18,6 @@ const CampaignEditor: React.FC = () => {
     fromName: '',
     fromEmail: '',
     htmlBody: '',
-    textBody: '',
   });
 
   const [campaignStatus, setCampaignStatus] = useState<CampaignStatus>(CampaignStatus.Draft);
@@ -51,7 +51,6 @@ const CampaignEditor: React.FC = () => {
         fromName: data.fromName,
         fromEmail: data.fromEmail,
         htmlBody: data.htmlBody,
-        textBody: data.textBody || '',
       });
       setCampaignStatus(data.status);
     } catch (error) {
@@ -72,9 +71,8 @@ const CampaignEditor: React.FC = () => {
       alert('Please fill in required fields (Name, Subject, Sender Email)');
       return false;
     }
-    const textBody = formData.textBody ?? '';
-    if (!formData.htmlBody.trim() && !textBody.trim()) {
-      alert('Provide either HTML Body or Text Fallback before sending.');
+    if (!formData.htmlBody.trim()) {
+      alert('Provide HTML Body before sending.');
       return false;
     }
     return true;
@@ -228,141 +226,75 @@ const CampaignEditor: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Split Layout */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
-        
-        {/* Left Column: Form */}
+      {/* Single Column Layout */}
+      <div className="flex-1 min-h-0">
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col overflow-hidden">
-            <div className="p-4 border-b border-gray-100 bg-gray-50 font-semibold text-gray-700 flex items-center gap-2">
-                Settings
+          <div className="p-4 border-b border-gray-100 bg-gray-50 font-semibold text-gray-700 flex items-center gap-2">
+            Settings
+          </div>
+          <div className="p-6 space-y-4 overflow-y-auto flex-1">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Campaign Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                disabled={isReadOnly}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
+                placeholder="e.g. Monthly Newsletter"
+              />
             </div>
-            <div className="p-6 space-y-4 overflow-y-auto flex-1">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Campaign Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        disabled={isReadOnly}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
-                        placeholder="e.g. Monthly Newsletter"
-                    />
-                </div>
-                
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Subject Line</label>
-                    <input
-                        type="text"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        disabled={isReadOnly}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
-                        placeholder="Great news inside!"
-                    />
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Sender Name</label>
-                        <input
-                            type="text"
-                            name="fromName"
-                            value={formData.fromName}
-                            onChange={handleChange}
-                            disabled={isReadOnly}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
-                            placeholder="Juan dela Cruz"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Sender Email</label>
-                        <input
-                            type="email"
-                            name="fromEmail"
-                            value={formData.fromEmail}
-                            onChange={handleChange}
-                            disabled={isReadOnly}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
-                            placeholder="juan@mailgo.com"
-                        />
-                    </div>
-                </div>
-
-                <div className="pt-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-                        <span>HTML Body</span>
-                        <span className="text-xs text-gray-400 font-normal">HTML supported (or leave blank if using text)</span>
-                    </label>
-                    <textarea
-                        name="htmlBody"
-                        value={formData.htmlBody}
-                        onChange={handleChange}
-                        disabled={isReadOnly}
-                        rows={10}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none font-mono text-sm disabled:bg-gray-100"
-                        placeholder="<h1>Hello!</h1><p>...</p>"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Text Body (optional if HTML is provided)</label>
-                    <textarea
-                        name="textBody"
-                        value={formData.textBody}
-                        onChange={handleChange}
-                        disabled={isReadOnly}
-                        rows={4}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none font-mono text-sm disabled:bg-gray-100"
-                        placeholder="Plain text version..."
-                    />
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Subject Line</label>
+              <input
+                type="text"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                disabled={isReadOnly}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
+                placeholder="Great news inside!"
+              />
             </div>
-        </div>
 
-        {/* Right Column: Preview */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col overflow-hidden">
-             <div className="p-4 border-b border-gray-100 bg-gray-50 font-semibold text-gray-700 flex items-center gap-2">
-                <Monitor size={16} />
-                Live Preview
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Sender Name</label>
+                <input
+                  type="text"
+                  name="fromName"
+                  value={formData.fromName}
+                  onChange={handleChange}
+                  disabled={isReadOnly}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
+                  placeholder="Juan dela Cruz"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Sender Email</label>
+                <input
+                  type="email"
+                  name="fromEmail"
+                  value={formData.fromEmail}
+                  onChange={handleChange}
+                  disabled={isReadOnly}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
+                  placeholder="juan@mailgo.com"
+                />
+              </div>
             </div>
-            <div className="flex-1 bg-gray-100 p-4 overflow-y-auto">
-                <div className="bg-white mx-auto max-w-2xl min-h-[500px] shadow-sm rounded-md overflow-hidden">
-                    {/* Simulated Email Header */}
-                    <div className="border-b border-gray-100 p-4 bg-gray-50 text-sm">
-                        <div className="flex mb-1">
-                            <span className="text-gray-500 w-16">Subject:</span>
-                            <span className="font-medium text-gray-900">{formData.subject || '(No Subject)'}</span>
-                        </div>
-                        <div className="flex">
-                             <span className="text-gray-500 w-16">From:</span>
-                             <span className="text-gray-900">
-                                {formData.fromName} &lt;{formData.fromEmail}&gt;
-                             </span>
-                        </div>
-                    </div>
-                    {/* HTML Content */}
-                    <div className="p-6 prose max-w-none">
-                        {formData.htmlBody ? (
-                            <iframe
-                                title="preview"
-                                srcDoc={formData.htmlBody}
-                                className="w-full h-[600px] border-none"
-                                sandbox="allow-same-origin" 
-                            />
-                        ) : formData.textBody ? (
-                            <pre className="text-sm text-gray-800 whitespace-pre-wrap break-words bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                {formData.textBody}
-                            </pre>
-                        ) : (
-                            <div className="text-gray-300 text-center py-20 italic">
-                                Start typing HTML or Text content to see a preview...
-                            </div>
-                        )}
-                    </div>
-                </div>
+
+            <div className="pt-2 space-y-2">
+              <RichTextEditor
+                value={formData.htmlBody}
+                onChange={(html) => handleChange({ target: { name: 'htmlBody', value: html } } as any)}
+                disabled={isReadOnly}
+              />
             </div>
+
+          </div>
         </div>
       </div>
 

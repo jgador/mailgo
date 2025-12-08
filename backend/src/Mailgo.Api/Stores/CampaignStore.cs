@@ -109,7 +109,6 @@ public class CampaignStore
             FromName = request.FromName.Trim(),
             FromEmail = request.FromEmail.Trim(),
             HtmlBody = request.HtmlBody,
-            TextBody = request.TextBody,
             Status = CampaignStatus.Draft,
             CreatedAt = DateTime.UtcNow,
             LastUpdatedAt = DateTime.UtcNow
@@ -141,7 +140,6 @@ public class CampaignStore
         campaign.FromName = request.FromName.Trim();
         campaign.FromEmail = request.FromEmail.Trim();
         campaign.HtmlBody = request.HtmlBody;
-        campaign.TextBody = request.TextBody;
         campaign.LastUpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

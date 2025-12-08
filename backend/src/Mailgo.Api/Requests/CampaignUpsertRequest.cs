@@ -28,16 +28,13 @@ public class CampaignUpsertRequest : IValidatableObject
     [JsonPropertyName("htmlBody")]
     public string HtmlBody { get; set; } = string.Empty;
 
-    [JsonPropertyName("textBody")]
-    public string? TextBody { get; set; }
-
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (string.IsNullOrWhiteSpace(HtmlBody) && string.IsNullOrWhiteSpace(TextBody))
+        if (string.IsNullOrWhiteSpace(HtmlBody))
         {
             yield return new ValidationResult(
-                "Either HTML Body or Text Body is required.",
-                new[] { nameof(HtmlBody), nameof(TextBody) });
+                "HTML Body is required.",
+                new[] { nameof(HtmlBody) });
         }
     }
 }
