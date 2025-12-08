@@ -3,7 +3,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Mailgo.Api.Options;
 
 namespace Mailgo.Api.Services;
 
