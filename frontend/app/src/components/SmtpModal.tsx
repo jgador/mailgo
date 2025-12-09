@@ -132,22 +132,35 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
     setPasswordError(null);
 
     try {
+      const trimmedHost = host.trim();
+      const trimmedUsername = username.trim();
+      if (!trimmedHost || !port) {
+        throw new Error('SMTP host and port are required.');
+      }
+      if (!trimmedUsername) {
+        throw new Error('SMTP username (sender email) is required.');
+      }
+
       let passwordPayload = encryptedPassword;
       if (password && smtpKey) {
         const cipherText = await encryptWithPublicKey(smtpKey.publicKeyPem, password);
         passwordPayload = { cipherText, keyId: smtpKey.keyId };
         saveSessionPassword(passwordPayload);
       }
+      const hasPassword = Boolean(passwordPayload?.cipherText);
+      if (!hasPassword) {
+        throw new Error('SMTP password is required to send.');
+      }
 
       const basePayload: SendNowRequest = {
-        smtpHost: host,
+        smtpHost: trimmedHost,
         smtpPort: port,
-        smtpUsername: username || undefined,
+        smtpUsername: trimmedUsername,
         smtpPasswordEncrypted: passwordPayload?.cipherText,
         smtpPasswordKeyId: passwordPayload?.keyId,
         encryption,
         allowSelfSigned: false,
-        overrideFromName: fromName || undefined,
+        overrideFromName: fromName.trim() || undefined,
       };
 
       if (password && !smtpKey) {

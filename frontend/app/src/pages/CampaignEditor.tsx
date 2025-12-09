@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { campaignService } from '../services/api';
+import { campaignService, recipientService } from '../services/api';
 import { CampaignStatus, CreateCampaignRequest, SendNowRequest, SendTestRequest } from '../types';
 import SmtpModal from '../components/SmtpModal';
 import RichTextEditor from '../components/RichTextEditor';
@@ -89,7 +89,6 @@ const CampaignEditor: React.FC = () => {
       const newCampaign = await campaignService.create(formData);
       setCampaignId(newCampaign.id);
       setCampaignStatus(newCampaign.status);
-      navigate(`/campaigns/${newCampaign.id}`, { replace: true });
       return newCampaign.id;
     } catch (error) {
       console.error('Failed to create campaign', error);
@@ -120,6 +119,21 @@ const CampaignEditor: React.FC = () => {
     }
   };
 
+  const ensureRecipientsExist = async (): Promise<boolean> => {
+    try {
+      const recipients = await recipientService.getAll(1, 1);
+      if (recipients.totalItems === 0) {
+        alert('Add at least one recipient before sending a campaign.');
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Failed to verify recipients', error);
+      alert('Unable to verify recipients. Please try again.');
+      return false;
+    }
+  };
+
   const handleSendTest = async (settings: SendTestRequest | SendNowRequest) => {
     const currentId = await ensureCampaignExists();
     if (!currentId || !('testEmail' in settings)) return;
@@ -128,6 +142,8 @@ const CampaignEditor: React.FC = () => {
   };
 
   const handleSendNow = async (settings: SendTestRequest | SendNowRequest) => {
+     const hasRecipients = await ensureRecipientsExist();
+     if (!hasRecipients) return;
      const currentId = await ensureCampaignExists();
      if (!currentId) return;
      const payload: SendNowRequest = {
@@ -140,9 +156,14 @@ const CampaignEditor: React.FC = () => {
         encryption: settings.encryption,
         overrideFromName: settings.overrideFromName,
      };
-     await campaignService.sendNow(currentId, payload);
-     alert('Campaign started successfully!');
-     navigate(`/campaigns/${currentId}`);
+     try {
+       await campaignService.sendNow(currentId, payload);
+       alert('Campaign started successfully!');
+       navigate(`/campaigns/${currentId}`);
+     } catch (error) {
+       console.error('Failed to start campaign send', error);
+       alert('Unable to start sending. Check SMTP settings and try again.');
+     }
   };
 
   const handleOpenTestModal = async () => {
