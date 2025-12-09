@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 namespace Mailgo.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/campaigns")]
 public class CampaignsController(
     CampaignStore campaignStore,
     ICampaignSendSessionStore sessionStore,

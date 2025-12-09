@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Mailgo.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/keys")]
 public class KeysController(ISmtpPasswordDecryptor decryptor) : ControllerBase
 {
     [HttpGet("smtp")]

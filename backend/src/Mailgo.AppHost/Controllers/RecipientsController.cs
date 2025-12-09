@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Mailgo.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/recipients")]
 public class RecipientsController(RecipientStore recipientStore) : ControllerBase
 {
     [HttpGet]
