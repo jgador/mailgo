@@ -20,7 +20,6 @@ interface SmtpModalProps {
   summaryCampaignName?: string;
   summarySubject?: string;
   summaryFromName?: string;
-  summaryFromEmail?: string;
 }
 
 const SmtpModal: React.FC<SmtpModalProps> = ({
@@ -32,13 +31,13 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
   summaryCampaignName,
   summarySubject,
   summaryFromName,
-  summaryFromEmail,
 }) => {
   const DEFAULT_PORT = 587;
   const [host, setHost] = useState('');
   const [port, setPort] = useState<number>(DEFAULT_PORT);
   const [portInput, setPortInput] = useState<string>(String(DEFAULT_PORT));
   const [username, setUsername] = useState('');
+  const [fromName, setFromName] = useState('');
   const [password, setPassword] = useState('');
   const [encryptedPassword, setEncryptedPassword] = useState<SessionPasswordCache | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -60,6 +59,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
     setPort(defaults.port || DEFAULT_PORT);
     setPortInput(String(defaults.port || DEFAULT_PORT));
     setUsername(defaults.username || '');
+    setFromName(defaults.overrideFromName || '');
     setEncryption(defaults.encryption || EncryptionType.StartTls);
     setError(null);
     setLoading(false);
@@ -147,6 +147,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
         smtpPasswordKeyId: passwordPayload?.keyId,
         encryption,
         allowSelfSigned: false,
+        overrideFromName: fromName || undefined,
       };
 
       if (password && !smtpKey) {
@@ -213,7 +214,7 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2">
                 <div className="text-sm text-gray-700">
                   <span className="font-semibold text-gray-800">From:</span>{' '}
-                  {summaryFromName || '—'} &lt;{summaryFromEmail || '—'}&gt;
+                  {fromName || summaryFromName || '-'} (uses SMTP username as sender email)
                 </div>
                 <div className="text-sm text-gray-700">
                   <span className="font-semibold text-gray-800">Subject:</span> {summarySubject || '—'}
@@ -287,6 +288,22 @@ const SmtpModal: React.FC<SmtpModalProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
                     placeholder="apikey or email"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Sender Name (used for this send)
+                  </label>
+                  <input
+                    type="text"
+                    value={fromName}
+                    onChange={(e) => setFromName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
+                    placeholder="Mailgo"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Sender email will use the SMTP username.
+                  </p>
                 </div>
 
                 <div>

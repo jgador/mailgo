@@ -28,9 +28,11 @@ public class MailKitEmailSender : IEmailSender
         var fromName = string.IsNullOrWhiteSpace(settings.OverrideFromName)
             ? campaign.FromName
             : settings.OverrideFromName;
-        var fromAddress = string.IsNullOrWhiteSpace(settings.OverrideFromAddress)
-            ? campaign.FromEmail
-            : settings.OverrideFromAddress;
+        var fromAddress = settings.Username;
+        if (string.IsNullOrWhiteSpace(fromAddress))
+        {
+            throw new InvalidOperationException("SMTP username (sender email) is required.");
+        }
 
         using var message = new MimeMessage();
         message.From.Add(new MailboxAddress(fromName, fromAddress));

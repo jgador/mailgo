@@ -46,10 +46,6 @@ public class SmtpSettingsRequest
     [JsonPropertyName("overrideFromName")]
     public string? OverrideFromName { get; set; }
 
-    [EmailAddress, MaxLength(256)]
-    [JsonPropertyName("overrideFromAddress")]
-    public string? OverrideFromAddress { get; set; }
-
     public async Task<SmtpSettings> ToSettingsAsync(
         ISmtpPasswordDecryptor decryptor,
         CancellationToken cancellationToken = default)
@@ -72,7 +68,6 @@ public class SmtpSettingsRequest
             Encryption,
             string.IsNullOrWhiteSpace(EncryptionHostname) ? null : EncryptionHostname,
             AllowSelfSigned,
-            string.IsNullOrWhiteSpace(OverrideFromName) ? null : OverrideFromName,
-            string.IsNullOrWhiteSpace(OverrideFromAddress) ? null : OverrideFromAddress);
+            string.IsNullOrWhiteSpace(OverrideFromName) ? null : OverrideFromName);
     }
 }

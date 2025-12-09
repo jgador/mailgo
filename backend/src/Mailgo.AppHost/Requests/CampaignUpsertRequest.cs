@@ -21,10 +21,6 @@ public class CampaignUpsertRequest : IValidatableObject
     [JsonPropertyName("fromName")]
     public string FromName { get; set; } = string.Empty;
 
-    [Required, EmailAddress, MaxLength(256)]
-    [JsonPropertyName("fromEmail")]
-    public string FromEmail { get; set; } = string.Empty;
-
     [JsonPropertyName("htmlBody")]
     public string HtmlBody { get; set; } = string.Empty;
 

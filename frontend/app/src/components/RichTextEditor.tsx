@@ -4,6 +4,7 @@ interface RichTextEditorProps {
   value: string;
   onChange: (html: string) => void;
   disabled?: boolean;
+  hideToolbar?: boolean;
 }
 
 const FONT_SIZES = [
@@ -29,7 +30,7 @@ const FONT_FAMILIES = [
 const COLORS = ['#000000', '#4B5563', '#9CA3AF', '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6'];
 const COLOR_POPOVER_WIDTH = 140; // approximate width of the 4-column swatch grid
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, disabled }) => {
+const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, disabled, hideToolbar }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const colorButtonRef = useRef<HTMLButtonElement>(null);
@@ -89,10 +90,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, disabl
 
   return (
     <div className="space-y-2">
-      <div
-        ref={toolbarRef}
-        className="relative flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-full shadow-sm px-2 py-1"
-      >
+      {!hideToolbar && (
+        <div
+          ref={toolbarRef}
+          className="relative flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-full shadow-sm px-2 py-1"
+        >
         {/* History */}
         <button
           type="button"
@@ -213,6 +215,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, disabl
           </span>
         </button>
       </div>
+      )}
 
       <div className="relative">
         <div
@@ -230,7 +233,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, disabl
           </div>
         )}
 
-        {showColorPicker && (
+        {showColorPicker && !hideToolbar && (
           <div
             className="absolute z-20 bg-white border border-gray-200 rounded-md shadow-lg p-2 grid grid-cols-4 gap-2"
             style={{ left: colorPopoverPos.left, top: colorPopoverPos.top }}

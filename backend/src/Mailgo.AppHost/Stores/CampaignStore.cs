@@ -117,7 +117,6 @@ public class CampaignStore
             Name = request.Name.Trim(),
             Subject = request.Subject.Trim(),
             FromName = request.FromName.Trim(),
-            FromEmail = request.FromEmail.Trim(),
             HtmlBody = request.HtmlBody,
             Status = CampaignStatus.Draft,
             CreatedAt = DateTime.UtcNow,
@@ -151,7 +150,6 @@ public class CampaignStore
         campaign.Name = request.Name.Trim();
         campaign.Subject = request.Subject.Trim();
         campaign.FromName = request.FromName.Trim();
-        campaign.FromEmail = request.FromEmail.Trim();
         campaign.HtmlBody = request.HtmlBody;
         campaign.LastUpdatedAt = DateTime.UtcNow;
 

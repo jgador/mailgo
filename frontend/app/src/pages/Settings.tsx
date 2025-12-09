@@ -28,9 +28,8 @@ const SettingsPage: React.FC = () => {
 
   useEffect(() => {
     const defaults = loadSmtpDefaults();
-    const sanitized = { ...defaults, allowSelfSigned: false, overrideFromAddress: '' };
-    setForm(sanitized);
-    setPortInput(String(sanitized.port));
+    setForm(defaults);
+    setPortInput(String(defaults.port));
     setPassword('');
     setPasswordError(null);
     const cached = loadSessionPassword();
@@ -66,9 +65,7 @@ const SettingsPage: React.FC = () => {
     e.preventDefault();
     setStatus('saving');
     try {
-      const sanitized = { ...form, overrideFromAddress: '' };
-      setForm(sanitized);
-      saveSmtpDefaults(sanitized);
+      saveSmtpDefaults(form);
       setStatus('saved');
       setTimeout(() => setStatus('idle'), 2500);
     } catch (err) {
@@ -111,7 +108,7 @@ const SettingsPage: React.FC = () => {
   const handleReset = () => {
     clearSmtpDefaults();
     const defaults = loadSmtpDefaults();
-    setForm({ ...defaults, port: 0, allowSelfSigned: false, overrideFromAddress: '' });
+    setForm({ ...defaults, port: 0, allowSelfSigned: false });
     setPortInput('');
     setPassword('');
     setEncryptedPassword(null);
@@ -227,19 +224,20 @@ const SettingsPage: React.FC = () => {
           {passwordError && <p className="text-xs text-red-600 mt-1">{passwordError}</p>}
         </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Default From Name (optional)
-              </label>
-            <input
-              type="text"
-              value={form.overrideFromName || ''}
-              onChange={(e) => handleChange('overrideFromName', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
-              placeholder="MailGo"
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Default From Name (optional)
+          </label>
+          <input
+            type="text"
+            value={form.overrideFromName || ''}
+            onChange={(e) => handleChange('overrideFromName', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none"
+            placeholder="Mailgo"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Sender email will use the SMTP username.
+          </p>
         </div>
 
         <div className="flex flex-wrap gap-3 pt-4">

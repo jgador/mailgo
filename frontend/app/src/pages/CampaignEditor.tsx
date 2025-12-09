@@ -16,7 +16,6 @@ const CampaignEditor: React.FC = () => {
     name: '',
     subject: '',
     fromName: '',
-    fromEmail: '',
     htmlBody: '',
   });
 
@@ -49,7 +48,6 @@ const CampaignEditor: React.FC = () => {
         name: data.name,
         subject: data.subject,
         fromName: data.fromName,
-        fromEmail: data.fromEmail,
         htmlBody: data.htmlBody,
       });
       setCampaignStatus(data.status);
@@ -67,12 +65,12 @@ const CampaignEditor: React.FC = () => {
   };
 
   const ensureRequiredFields = () => {
-    if (!formData.name || !formData.subject || !formData.fromEmail) {
-      alert('Please fill in required fields (Name, Subject, Sender Email)');
+    if (!formData.name || !formData.subject || !formData.fromName) {
+      alert('Please fill in required fields (Name, Subject, Sender Name)');
       return false;
     }
     if (!formData.htmlBody.trim()) {
-      alert('Provide HTML Body before sending.');
+      alert('Please add an email body before saving or sending.');
       return false;
     }
     return true;
@@ -140,6 +138,7 @@ const CampaignEditor: React.FC = () => {
         smtpPasswordEncrypted: (settings as SendNowRequest).smtpPasswordEncrypted,
         smtpPasswordKeyId: (settings as SendNowRequest).smtpPasswordKeyId,
         encryption: settings.encryption,
+        overrideFromName: settings.overrideFromName,
      };
      await campaignService.sendNow(currentId, payload);
      alert('Campaign started successfully!');
@@ -259,31 +258,18 @@ const CampaignEditor: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sender Name</label>
-                <input
-                  type="text"
-                  name="fromName"
-                  value={formData.fromName}
-                  onChange={handleChange}
-                  disabled={isReadOnly}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
-                  placeholder="Juan dela Cruz"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sender Email</label>
-                <input
-                  type="email"
-                  name="fromEmail"
-                  value={formData.fromEmail}
-                  onChange={handleChange}
-                  disabled={isReadOnly}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
-                  placeholder="juan@mailgo.com"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Sender Name</label>
+              <input
+                type="text"
+                name="fromName"
+                value={formData.fromName}
+                onChange={handleChange}
+                disabled={isReadOnly}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none disabled:bg-gray-100"
+                placeholder="Mailgo"
+              />
+              <p className="text-xs text-gray-500 mt-1">Sender name can be overridden in SMTP settings.</p>
             </div>
 
             <div className="pt-2 space-y-2">
@@ -315,7 +301,6 @@ const CampaignEditor: React.FC = () => {
         summaryCampaignName={formData.name}
         summarySubject={formData.subject}
         summaryFromName={formData.fromName}
-        summaryFromEmail={formData.fromEmail}
       />
     </div>
   );

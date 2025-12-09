@@ -10,7 +10,6 @@ export interface CampaignSummary {
   name: string;
   subject: string;
   fromName: string;
-  fromEmail: string;
   status: CampaignStatus;
   totalRecipients: number;
   sentCount: number;
@@ -63,7 +62,6 @@ export interface SmtpSettings {
   encryption: EncryptionType;
   allowSelfSigned?: boolean;
   overrideFromName?: string;
-  overrideFromAddress?: string;
 }
 
 export interface SendTestRequest extends SmtpSettings {
@@ -76,7 +74,6 @@ export interface CreateCampaignRequest {
   name: string;
   subject: string;
   fromName: string;
-  fromEmail: string;
   htmlBody: string;
 }
 

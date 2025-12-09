@@ -9,7 +9,6 @@ export interface SmtpDefaults {
   encryption: EncryptionType;
   allowSelfSigned: boolean;
   overrideFromName?: string;
-  overrideFromAddress?: string;
 }
 
 const defaultValues: SmtpDefaults = {
@@ -19,7 +18,6 @@ const defaultValues: SmtpDefaults = {
   encryption: EncryptionType.StartTls,
   allowSelfSigned: false,
   overrideFromName: '',
-  overrideFromAddress: '',
 };
 
 export function loadSmtpDefaults(): SmtpDefaults {

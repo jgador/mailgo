@@ -14,7 +14,6 @@ public class CampaignSummaryResponse
         string name,
         string subject,
         string fromName,
-        string fromEmail,
         CampaignStatus status,
         int totalRecipients,
         int sentCount,
@@ -26,7 +25,6 @@ public class CampaignSummaryResponse
         Name = name;
         Subject = subject;
         FromName = fromName;
-        FromEmail = fromEmail;
         Status = status;
         TotalRecipients = totalRecipients;
         SentCount = sentCount;
@@ -46,9 +44,6 @@ public class CampaignSummaryResponse
 
     [JsonPropertyName("fromName")]
     public string FromName { get; }
-
-    [JsonPropertyName("fromEmail")]
-    public string FromEmail { get; }
 
     [JsonPropertyName("status")]
     public CampaignStatus Status { get; }

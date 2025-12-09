@@ -25,7 +25,7 @@ const Layout: React.FC = () => {
               />
             </div>
             <div className="leading-tight">
-              <span className="block">MailGo</span>
+              <span className="block">Mailgo</span>
               <span className="text-xs font-semibold text-brand-blue">Campaign Manager</span>
             </div>
           </div>

@@ -13,6 +13,5 @@ public record SmtpSettings(
     EncryptionType Encryption,
     string? EncryptionHostname,
     bool AllowSelfSignedCertificates,
-    string? OverrideFromName,
-    string? OverrideFromAddress);
+    string? OverrideFromName);
 
