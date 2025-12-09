@@ -4,8 +4,8 @@ ASP.NET Core + EF Core services live under `backend/`. The solution is `Mailgo.s
 
 ## Layout
 
-- `src/Mailgo.Api` — HTTP API + background services (SQLite by default)
-- `src/Mailgo.Domain` — shared entities, enums, DTOs
+- `src/Mailgo.AppHost` — HTTP API + background services (SQLite by default)
+- `src/Mailgo.AppHost/Domain` — shared entities, enums, DTOs
 - `tests/` — placeholder for future xUnit/BDD specs
 - `docker/` — container build assets (e.g., `api.Dockerfile`)
 - `scripts/` — automation hooks (`dotnet format`, seeding, etc.)
@@ -15,7 +15,7 @@ ASP.NET Core + EF Core services live under `backend/`. The solution is `Mailgo.s
 ```bash
 cd backend
 dotnet restore Mailgo.sln
-dotnet run --project src/Mailgo.Api/Mailgo.Api.csproj
+dotnet run --project src/Mailgo.AppHost/Mailgo.AppHost.csproj
 ```
 
 Set `ConnectionStrings__Default` to change the SQLite location (or point to another provider) and optionally override `ASPNETCORE_URLS`. SMTP information is never read from configuration—the API expects each send/test call to provide host/credential details.
@@ -35,6 +35,6 @@ Run migrations from the backend root to keep relative paths intact:
 
 ```bash
 cd backend
-dotnet ef migrations add <Name> --project src/Mailgo.Api
-dotnet ef database update --project src/Mailgo.Api
+dotnet ef migrations add <Name> --project src/Mailgo.AppHost
+dotnet ef database update --project src/Mailgo.AppHost
 ```
