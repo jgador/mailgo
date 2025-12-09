@@ -1,9 +1,11 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { LayoutDashboard, Users, PlusCircle, Settings } from 'lucide-react';
+import packageJson from '../../package.json';
 
 const Layout: React.FC = () => {
   const logoSrc = `${process.env.PUBLIC_URL || ''}/brand/mailgo.png`;
+  const appVersion = packageJson.version;
   const navClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg border transition-colors ${
       isActive
@@ -57,7 +59,7 @@ const Layout: React.FC = () => {
         </nav>
 
         <div className="p-4 border-t border-gray-200 text-xs text-brand-navy/60 text-center">
-          v1.0.0
+          v{appVersion}
         </div>
       </aside>
 

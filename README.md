@@ -2,6 +2,10 @@
 
 Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), a React dashboard, and an optional Electron desktop shell that bundles both.
 
+<p align="center">
+  <img src="docs/media/mailgo-homepage.png" alt="Mailgo homepage dashboard" width="960">
+</p>
+
 ## Table of Contents
 - [Overview](#overview)
 - [Quick Start (web)](#quick-start-web)
