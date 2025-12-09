@@ -3,6 +3,7 @@ $ErrorActionPreference = "Stop"
 $projectPath = Join-Path $PSScriptRoot "..\..\backend\src\Mailgo.AppHost\Mailgo.AppHost.csproj"
 $outputPath = Join-Path $PSScriptRoot "..\resources\backend"
 
+# Publishing win-x64 only for now (current test machine).
 Write-Host "Publishing backend to $outputPath"
 dotnet publish `
   $projectPath `

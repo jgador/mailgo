@@ -18,6 +18,7 @@ win:
   target:
     - nsis
   icon: src/assets/icons/icon.png
+artifactName: mailgo-${version}-win-x64.exe
 nsis:
   createDesktopShortcut: false
   shortcutName: Mailgo

@@ -2,42 +2,28 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const projectPath = path.resolve(__dirname, '../../backend/src/Mailgo.AppHost/Mailgo.AppHost.csproj');
-const outputPath = path.resolve(__dirname, '../resources/backend');
+// Reuse the PowerShell publish script so we have a single source of truth.
+// Note: this requires Windows/PowerShell. For non-Windows, keep the older
+// dotnet publish flow or add a cross-platform script as needed.
+const psScript = path.resolve(__dirname, 'build-backend.ps1');
 
+if (process.platform !== 'win32') {
+  console.error('[build-backend] PowerShell script is Windows-only. Run dotnet publish manually on this OS.');
+  process.exit(1);
+}
+
+// Ensure output directory exists (script will write here).
+const outputPath = path.resolve(__dirname, '../resources/backend');
 fs.mkdirSync(outputPath, { recursive: true });
 
-const runtime =
-  process.platform === 'win32'
-    ? 'win-x64'
-    : process.platform === 'darwin'
-      ? 'osx-x64'
-      : 'linux-x64';
-
-console.log(`Publishing backend to ${outputPath}`);
-const publishArgs = [
-  'publish',
-  projectPath,
-  '-c',
-  'Release',
-  '-o',
-  outputPath,
-  '-r',
-  runtime,
-  '--self-contained',
-  'true',
-  '-p:PublishSingleFile=true',
-  '-p:IncludeNativeLibrariesForSelfExtract=true',
-  '-p:PublishTrimmed=false'
-];
-
-const result = spawnSync('dotnet', publishArgs, {
+console.log(`[build-backend] Publishing via PowerShell: ${psScript}`);
+const result = spawnSync('powershell.exe', ['-ExecutionPolicy', 'Bypass', '-File', psScript], {
   stdio: 'inherit'
 });
 
 if (result.status !== 0) {
-  console.error('dotnet publish failed');
+  console.error('[build-backend] dotnet publish failed via PowerShell');
   process.exit(result.status ?? 1);
 }
 
-console.log('Backend publish complete.');
+console.log('[build-backend] Backend publish complete.');
