@@ -19,7 +19,10 @@ Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), 
 - SMTP credentials are only provided at send time; nothing sensitive is persisted server-side.
 - Choose your runtime:
   - Web/Docker: run the API and CRA build behind Nginx.
-  - Desktop: Electron wrapper that ships the CRA build and backend together.
+- Desktop: Electron wrapper that ships the CRA build and backend together.
+
+## Downloads (Windows x64)
+- Prebuilt desktop installer (Windows x64): see `binaries/mailgo-<version>-win-x64.exe`. These builds are produced on/for Windows x64 (my test machine). Other platforms will follow as I can test them; PRs are welcome.
 
 ## Quick Start (web)
 1. API
