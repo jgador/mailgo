@@ -22,7 +22,7 @@ Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), 
 - Desktop: Electron wrapper that ships the CRA build and backend together.
 
 ## Downloads (Windows x64)
-- Prebuilt desktop installer (Windows x64): see `binaries/mailgo-<version>-win-x64.exe`. These builds are produced on/for Windows x64 (my test machine). Other platforms will follow as I can test them; PRs are welcome.
+- Fastest path: install the Windows x64 desktop build from `binaries/mailgo-<version>-win-x64.exe` (built/tested on Windows x64). After install, the app resources and local SQLite database live under `%LocalAppData%\Programs\mailgo\resources` on Windows. Other platforms will follow as I can test them; PRs are welcome.
 
 ## Quick Start (web)
 1. API
