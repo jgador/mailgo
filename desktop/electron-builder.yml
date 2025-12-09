@@ -18,6 +18,9 @@ win:
   target:
     - nsis
   icon: src/assets/icons/icon.png
+nsis:
+  createDesktopShortcut: false
+  shortcutName: Mailgo
 mac:
   target:
     - dmg

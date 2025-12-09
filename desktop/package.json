@@ -1,5 +1,5 @@
 {
-  "name": "mailgo-desktop",
+  "name": "mailgo",
   "version": "1.0.0-rc1",
   "description": "Electron shell for the Mailgo local email campaign app.",
   "private": true,
