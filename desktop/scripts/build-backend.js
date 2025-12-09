@@ -7,8 +7,31 @@ const outputPath = path.resolve(__dirname, '../resources/backend');
 
 fs.mkdirSync(outputPath, { recursive: true });
 
+const runtime =
+  process.platform === 'win32'
+    ? 'win-x64'
+    : process.platform === 'darwin'
+      ? 'osx-x64'
+      : 'linux-x64';
+
 console.log(`Publishing backend to ${outputPath}`);
-const result = spawnSync('dotnet', ['publish', projectPath, '-c', 'Release', '-o', outputPath], {
+const publishArgs = [
+  'publish',
+  projectPath,
+  '-c',
+  'Release',
+  '-o',
+  outputPath,
+  '-r',
+  runtime,
+  '--self-contained',
+  'true',
+  '-p:PublishSingleFile=true',
+  '-p:IncludeNativeLibrariesForSelfExtract=true',
+  '-p:PublishTrimmed=false'
+];
+
+const result = spawnSync('dotnet', publishArgs, {
   stdio: 'inherit'
 });
 

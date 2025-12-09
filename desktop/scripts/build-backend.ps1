@@ -4,6 +4,14 @@ $projectPath = Join-Path $PSScriptRoot "..\..\backend\src\Mailgo.AppHost\Mailgo.
 $outputPath = Join-Path $PSScriptRoot "..\resources\backend"
 
 Write-Host "Publishing backend to $outputPath"
-dotnet publish $projectPath -c Release -o $outputPath
+dotnet publish `
+  $projectPath `
+  -c Release `
+  -o $outputPath `
+  -r win-x64 `
+  --self-contained true `
+  -p:PublishSingleFile=true `
+  -p:IncludeNativeLibrariesForSelfExtract=true `
+  -p:PublishTrimmed=false
 
 Write-Host "Backend publish complete."

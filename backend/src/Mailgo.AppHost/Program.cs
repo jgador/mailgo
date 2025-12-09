@@ -11,16 +11,23 @@ using Mailgo.Api.Options;
 using Mailgo.Api.Services;
 using Mailgo.Api.Stores;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 public partial class Program
 {
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        var runtimeUrl = builder.Configuration["ASPNETCORE_URLS"];
+        if (!string.IsNullOrWhiteSpace(runtimeUrl))
+        {
+            builder.WebHost.UseUrls(runtimeUrl);
+        }
 
         var dataDirectory = Path.Combine(AppContext.BaseDirectory, "data");
         Directory.CreateDirectory(dataDirectory);
@@ -63,16 +70,20 @@ public partial class Program
 
         var app = builder.Build();
 
+        app.Lifetime.ApplicationStarted.Register(() =>
+        {
+            var resolvedUrls = string.Join(", ", app.Urls);
+            app.Logger.LogInformation("Mailgo API runtime URL: {RuntimeUrl}", runtimeUrl ?? "not set (using Kestrel defaults)");
+            app.Logger.LogInformation("Mailgo API listening on {Urls}", string.IsNullOrWhiteSpace(resolvedUrls) ? "unknown" : resolvedUrls);
+        });
+
         using var scope = app.Services.CreateScope();
         var dbContextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
         using var dbContext = dbContextFactory.CreateDbContext();
         dbContext.Database.Migrate();
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
         app.UseCors("default");
 

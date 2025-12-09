@@ -24,8 +24,8 @@ export const getBackendDirectory = () => {
 };
 
 export const getDataDirectory = () => {
-  const dataDir = path.join(app.getPath('userData'), 'data');
-  return dataDir;
+  const backendDir = getBackendDirectory();
+  return path.join(backendDir, 'data');
 };
 
 export const getAppIcon = () => {
