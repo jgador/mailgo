@@ -25,15 +25,16 @@ Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), 
 1. API
    ```bash
    cd backend
-   dotnet build Mailgo.sln
-   dotnet run --project src/Mailgo.Api/Mailgo.Api.csproj
+   dotnet restore Mailgo.sln
+   dotnet run --project src/Mailgo.AppHost/Mailgo.AppHost.csproj
    ```
-   - Default URL: `http://localhost:5000` (override with `ASPNETCORE_URLS`).
+   - Launch profile binds to `http://localhost:5004` by default; override with `ASPNETCORE_URLS`.
+   - SQLite defaults to `data/app.db` under the build output; set `ConnectionStrings__Default` to point elsewhere.
 2. Frontend
    ```bash
    cd frontend/app
    npm install
-   REACT_APP_API_BASE_URL=http://localhost:5000/api npm start
+   REACT_APP_API_BASE_URL=http://localhost:5004/api npm start
    ```
    - CRA dev server runs on `http://localhost:3000`.
    - Persist settings in `frontend/app/.env.local` (`REACT_APP_` prefix required).
@@ -66,18 +67,18 @@ docker compose up --build
 - SQLite data persisted in `../data`
 
 ## Docs
-- Product PRD: `docs/product/prd.md`
 - Electron/Desktop guide: `docs/electron/README.md`
 - Backend notes: `backend/README.md`
 - Frontend notes: `frontend/app/README.md`
 - Infra/compose notes: `infra/README.md`
+- Media assets (screenshots/logos): `docs/media/`
 
 ## Repository Layout
 - `backend/` - .NET solution (`Mailgo.sln`), API + domain projects, backend Dockerfile
 - `frontend/` - CRA dashboard source (`app/`), frontend Dockerfile, UI tests
 - `desktop/` - Electron shell, build scripts, and packaging configuration
 - `infra/` - `docker-compose.yml` plus deployment-facing docs
-- `docs/` - architecture & product docs
+- `docs/` - desktop guide and shared media assets
 - `data/` - local SQLite files mounted into containers (gitignored)
 - `scripts/` - shared automation entry points (currently placeholder)
 - `recipient-sample.csv` - CSV format reference for recipient imports

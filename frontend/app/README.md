@@ -1,21 +1,25 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Mailgo Frontend
 
-# Run and deploy your AI Studio app
+React + TypeScript dashboard for the Mailgo local email campaign tool (Create React App).
 
-This contains everything you need to run your app locally.
+## Run locally
+Prerequisites: Node.js 18+ and a running backend (`dotnet run --project ../backend/src/Mailgo.AppHost/Mailgo.AppHost.csproj`).
 
-View your app in AI Studio: https://ai.studio/apps/temp/2
+```bash
+cd frontend/app
+npm install
+REACT_APP_API_BASE_URL=http://localhost:5004/api npm start
+```
 
-## Run Locally
+- CRA dev server is at `http://localhost:3000`.
+- Persist defaults in `.env.local` (must use the `REACT_APP_` prefix).
 
-**Prerequisites:** Node.js 18+
+## Environment
+- `REACT_APP_API_BASE_URL` (required): API base URL, e.g. `http://localhost:5004/api` for local dev or `http://localhost:5000/api` when using Docker.
+- `PUBLIC_URL` (optional): set for non-root deployments or desktop packaging.
 
-1. Install dependencies: `npm install`
-2. Configure API/SMTP defaults in [.env.local](.env.local) (e.g. `REACT_APP_API_BASE_URL=http://localhost:5000/api`)
-3. Start the CRA dev server: `npm start`
-
-Each send/test dialog lets you configure SMTP host, port, encryption mode, optional TLS hostname, acceptance of self-signed certificates, and optional From overrides. These values are not persisted; populate defaults via `.env.local` if desired.
-
-For a production build, run `npm run build` (output is written to `build/`).
+## Build
+```bash
+npm run build
+```
+Outputs the production bundle to `build/`. Use `PUBLIC_URL=. npm run build` when building for desktop/Electron so assets resolve correctly from `file://` paths.
