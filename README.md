@@ -28,20 +28,20 @@ Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), 
    dotnet restore Mailgo.sln
    dotnet run --project src/Mailgo.AppHost/Mailgo.AppHost.csproj
    ```
-   - Launch profile binds to `http://localhost:5004` by default; override with `ASPNETCORE_URLS`.
+   - Launch profile binds to `http://localhost:8080` (and `https://localhost:8443`) by default; override with `ASPNETCORE_URLS`.
    - SQLite defaults to `data/app.db` under the build output; set `ConnectionStrings__Default` to point elsewhere.
 2. Frontend
    ```bash
    cd frontend/app
    npm install
-   REACT_APP_API_BASE_URL=http://localhost:5004/api npm start
+   REACT_APP_API_BASE_URL=http://localhost:8080/api npm start
    ```
    - CRA dev server runs on `http://localhost:3000`.
    - Persist settings in `frontend/app/.env.local` (`REACT_APP_` prefix required).
 
 ## Desktop (Electron)
 - Location: `desktop/` (uses the same CRA build and backend binaries).
-- Prerequisites: Node 22+, .NET 10 SDK.
+- Prerequisites: Node 20+, .NET 10 SDK.
 - Dev (starts CRA, backend `dotnet watch`, and Electron pointing at the dev server):
   ```bash
   cd desktop
@@ -54,7 +54,7 @@ Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), 
   npm install
   npm run build
   ```
-  - Backend listens on `http://localhost:5850/api` inside the desktop app; SQLite lives in your OS user data folder.
+  - Backend listens on `http://localhost:8080/api` inside the desktop app; SQLite lives in your OS user data folder.
   - See `docs/electron/README.md` for structure, ports, and troubleshooting.
 
 ## Docker Compose
@@ -62,7 +62,7 @@ Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), 
 cd infra
 docker compose up --build
 ```
-- `api` (ASP.NET Core) on `localhost:5000`
+- `api` (ASP.NET Core) on `localhost:8080`
 - `web` (CRA build served via Nginx) on `localhost:3000`, proxying `/api`
 - SQLite data persisted in `../data`
 

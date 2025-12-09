@@ -1,6 +1,89 @@
-@Mailgo.Api_HostAddress = http://localhost:5004
+@host = http://localhost:8080
+@api = {{host}}/api
+# Switch to https://localhost:8443 if running with TLS enabled.
 
-GET {{Mailgo.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Health check
+GET {{host}}/health
+
+### SMTP public key (for encrypting passwords)
+GET {{api}}/keys/smtp
+
+### List campaigns
+GET {{api}}/campaigns
+
+### Get campaign by id
+@campaignId = 00000000-0000-0000-0000-000000000000
+GET {{api}}/campaigns/{{campaignId}}
+
+### Campaign logs
+GET {{api}}/campaigns/{{campaignId}}/logs
+
+### Create campaign
+POST {{api}}/campaigns
+Content-Type: application/json
+
+{
+  "name": "Welcome Series",
+  "subject": "Welcome to Mailgo",
+  "fromName": "Mailgo Team",
+  "htmlBody": "<p>Hi {{FirstName}},</p><p>Thanks for joining.</p>"
+}
+
+### Update campaign
+PUT {{api}}/campaigns/{{campaignId}}
+Content-Type: application/json
+
+{
+  "name": "Welcome Series (updated)",
+  "subject": "Updated subject",
+  "fromName": "Mailgo Team",
+  "htmlBody": "<p>Updated body</p>"
+}
+
+### Send test email for a campaign
+POST {{api}}/campaigns/{{campaignId}}/send-test
+Content-Type: application/json
+
+{
+  "testEmail": "you@example.com",
+  "smtpHost": "smtp.example.com",
+  "smtpPort": 587,
+  "smtpUsername": "user",
+  "smtpPassword": "pass",
+  "encryption": "StartTls",
+  "encryptionHostname": "smtp.example.com",
+  "allowSelfSigned": false,
+  "overrideFromName": "Mailgo Team"
+}
+
+### Queue full send for a campaign
+POST {{api}}/campaigns/{{campaignId}}/send-now
+Content-Type: application/json
+
+{
+  "smtpHost": "smtp.example.com",
+  "smtpPort": 587,
+  "smtpUsername": "user",
+  "smtpPassword": "pass",
+  "encryption": "StartTls",
+  "encryptionHostname": "smtp.example.com",
+  "allowSelfSigned": false,
+  "overrideFromName": "Mailgo Team"
+}
+
+### List recipients
+GET {{api}}/recipients?page=1&pageSize=50
+
+### Upload recipients CSV (fields: email, first_name, last_name)
+@csvFilePath = ..\\..\\..\\recipient-sample.csv
+POST {{api}}/recipients/upload
+Content-Type: multipart/form-data; boundary=recipients-boundary
+
+--recipients-boundary
+Content-Disposition: form-data; name="file"; filename="recipients.csv"
+Content-Type: text/csv
+
+< {{csvFilePath}}
+--recipients-boundary--
 
 ###

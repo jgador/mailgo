@@ -2,7 +2,7 @@ import path from 'path';
 import { app } from 'electron';
 
 export const FRONTEND_DEV_URL = process.env.ELECTRON_RENDERER_URL ?? 'http://localhost:3000';
-export const BACKEND_PORT = process.env.MAILGO_BACKEND_PORT ?? '5850';
+export const BACKEND_PORT = process.env.MAILGO_BACKEND_PORT ?? '8080';
 export const API_BASE_URL = `http://localhost:${BACKEND_PORT}/api`;
 
 export const getFrontendEntry = () => {

@@ -13,7 +13,7 @@ The React dashboard now lives under `frontend/`. The CRA project stays in `app/`
 ```bash
 cd frontend/app
 npm install
-REACT_APP_API_BASE_URL=http://localhost:5000/api npm start
+REACT_APP_API_BASE_URL=http://localhost:8080/api npm start
 ```
 
 Persist env vars in `frontend/app/.env.local` (keys must stay prefixed with `REACT_APP_`).

@@ -27,10 +27,10 @@ npm run dev
 ```
 What happens:
 - `dev:frontend`: `npm start` in `frontend/app` on `http://localhost:3000`.
-- `dev:backend`: `dotnet watch` for `backend/src/Mailgo.Api` on port `5850`.
+- `dev:backend`: `dotnet watch` for `backend/src/Mailgo.Api` on port `8080`.
 - `dev:electron`: waits for the dev server, then launches Electron pointing at it.
 - The renderer pulls `apiBaseUrl` from `REACT_APP_API_BASE_URL` if set, otherwise from `window.electron.apiBaseUrl` (provided by preload).
-- In dev, the embedded backend is skipped; the app expects the `dotnet watch` instance on port `5850`. Set `START_EMBEDDED_BACKEND=true` if you want Electron to launch the published backend locally.
+- In dev, the embedded backend is skipped; the app expects the `dotnet watch` instance on port `8080`. Set `START_EMBEDDED_BACKEND=true` if you want Electron to launch the published backend locally.
 
 ## Build + package (desktop)
 ```bash
@@ -44,7 +44,7 @@ Steps run in order:
 3) `dotnet publish` backend into `desktop/resources/backend`  
 4) `tsc` main/preload -> `dist/`, then `electron-builder` -> `out/` installers  
 
-Backend URL inside the packaged app: `http://localhost:5850/api`.  
+Backend URL inside the packaged app: `http://localhost:8080/api`.  
 Data location: `AppData/Roaming/Mailgo/data` on Windows, `~/Library/Application Support/Mailgo/data` on macOS, `~/.config/Mailgo/data` on Linux.
 
 ## Configuration notes
