@@ -6,6 +6,7 @@ using System.IO;
 using System.Text.Json.Serialization;
 using Mailgo.Api.Background;
 using Mailgo.Api.Data;
+using Mailgo.Api.Health;
 using Mailgo.Api.Options;
 using Mailgo.Api.Services;
 using Mailgo.Api.Stores;
@@ -37,6 +38,9 @@ public partial class Program
         builder.Services.AddScoped<CampaignStore>();
         builder.Services.AddScoped<RecipientStore>();
         builder.Services.AddHostedService<CampaignSenderService>();
+        builder.Services
+            .AddHealthChecks()
+            .AddCheck<DatabaseHealthCheck>("database");
 
         builder.Services
             .AddControllers()
@@ -72,6 +76,7 @@ public partial class Program
 
         app.UseCors("default");
 
+        app.MapHealthChecks("/health");
         app.MapControllers();
 
         app.Run();
