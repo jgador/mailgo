@@ -2,7 +2,7 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const projectPath = path.resolve(__dirname, '../../backend/src/Mailgo.Api/Mailgo.Api.csproj');
+const projectPath = path.resolve(__dirname, '../../backend/src/Mailgo.AppHost/Mailgo.AppHost.csproj');
 const outputPath = path.resolve(__dirname, '../resources/backend');
 
 fs.mkdirSync(outputPath, { recursive: true });

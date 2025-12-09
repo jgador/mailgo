@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$projectPath = Join-Path $PSScriptRoot "..\..\backend\src\Mailgo.Api\Mailgo.Api.csproj"
+$projectPath = Join-Path $PSScriptRoot "..\..\backend\src\Mailgo.AppHost\Mailgo.AppHost.csproj"
 $outputPath = Join-Path $PSScriptRoot "..\resources\backend"
 
 Write-Host "Publishing backend to $outputPath"

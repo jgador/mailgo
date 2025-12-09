@@ -7,8 +7,8 @@ import { BACKEND_PORT, getBackendDirectory, getDataDirectory } from './config';
 let backendProcess: ChildProcessWithoutNullStreams | null = null;
 
 const findExecutable = (backendDir: string) => {
-  const exePath = path.join(backendDir, process.platform === 'win32' ? 'Mailgo.Api.exe' : 'Mailgo.Api');
-  const dllPath = path.join(backendDir, 'Mailgo.Api.dll');
+  const exePath = path.join(backendDir, process.platform === 'win32' ? 'Mailgo.AppHost.exe' : 'Mailgo.AppHost');
+  const dllPath = path.join(backendDir, 'Mailgo.AppHost.dll');
 
   if (fs.existsSync(exePath)) {
     return { command: exePath, args: [] };
