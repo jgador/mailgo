@@ -10,15 +10,22 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Mailgo.Api.Health;
 
-public class DatabaseHealthCheck(IDbContextFactory<ApplicationDbContext> dbContextFactory) : IHealthCheck
+public class DatabaseHealthCheck : IHealthCheck
 {
+    private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
+
+    public DatabaseHealthCheck(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    {
+        _dbContextFactory = dbContextFactory;
+    }
+
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+            using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
             var canConnect = await dbContext.Database.CanConnectAsync(cancellationToken).ConfigureAwait(false);
             return canConnect
                 ? HealthCheckResult.Healthy()

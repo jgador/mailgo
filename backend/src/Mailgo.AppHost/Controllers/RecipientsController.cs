@@ -20,8 +20,15 @@ namespace Mailgo.Api.Controllers;
 
 [ApiController]
 [Route("api/recipients")]
-public class RecipientsController(RecipientStore recipientStore) : ControllerBase
+public class RecipientsController : ControllerBase
 {
+    private readonly RecipientStore _recipientStore;
+
+    public RecipientsController(RecipientStore recipientStore)
+    {
+        _recipientStore = recipientStore;
+    }
+
     [HttpGet]
     public async Task<ActionResult<PagedResult<RecipientResponse>>> GetRecipients(
         [FromQuery] int page = 1,
@@ -31,7 +38,7 @@ public class RecipientsController(RecipientStore recipientStore) : ControllerBas
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 500);
 
-        var recipientsPage = await recipientStore.GetRecipientsAsync(page, pageSize, cancellationToken).ConfigureAwait(false);
+        var recipientsPage = await _recipientStore.GetRecipientsAsync(page, pageSize, cancellationToken).ConfigureAwait(false);
         return Ok(recipientsPage);
     }
 
@@ -59,7 +66,7 @@ public class RecipientsController(RecipientStore recipientStore) : ControllerBas
         var insertedCount = 0;
         var skippedCount = 0;
 
-        var existingEmails = await recipientStore.GetExistingRecipientEmailsAsync(cancellationToken).ConfigureAwait(false);
+        var existingEmails = await _recipientStore.GetExistingRecipientEmailsAsync(cancellationToken).ConfigureAwait(false);
 
         var newRecipients = new List<Recipient>();
 
@@ -115,7 +122,7 @@ public class RecipientsController(RecipientStore recipientStore) : ControllerBas
             return BadRequest("CSV must contain at least an 'email' column.");
         }
 
-        insertedCount = await recipientStore.SaveRecipientsAsync(newRecipients, cancellationToken).ConfigureAwait(false);
+        insertedCount = await _recipientStore.SaveRecipientsAsync(newRecipients, cancellationToken).ConfigureAwait(false);
 
         var uploadResult = new RecipientUploadResultResponse(totalRows, insertedCount, skippedCount);
         return Ok(uploadResult);

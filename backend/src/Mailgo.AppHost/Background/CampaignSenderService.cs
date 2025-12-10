@@ -15,15 +15,28 @@ using Microsoft.Extensions.Logging;
 
 namespace Mailgo.Api.Background;
 
-public class CampaignSenderService(
-    IServiceScopeFactory scopeFactory,
-    ICampaignSendSessionStore sessionStore,
-    ILogger<CampaignSenderService> logger,
-    IEmailSender emailSender) : BackgroundService
+public class CampaignSenderService : BackgroundService
 {
     private const int BatchSize = 20;
     private static readonly TimeSpan IdlePollInterval = TimeSpan.FromSeconds(30);
-    private static readonly TimeSpan ActivePollInterval = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan ActivePollInterval = TimeSpan.FromSeconds(3);
+
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ICampaignSendSessionStore _sessionStore;
+    private readonly ILogger<CampaignSenderService> _logger;
+    private readonly IEmailSender _emailSender;
+
+    public CampaignSenderService(
+        IServiceScopeFactory scopeFactory,
+        ICampaignSendSessionStore sessionStore,
+        ILogger<CampaignSenderService> logger,
+        IEmailSender emailSender)
+    {
+        _scopeFactory = scopeFactory;
+        _sessionStore = sessionStore;
+        _logger = logger;
+        _emailSender = emailSender;
+    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -31,7 +44,7 @@ public class CampaignSenderService(
         {
             try
             {
-                using var scope = scopeFactory.CreateScope();
+                using var scope = _scopeFactory.CreateScope();
                 var campaignStore = scope.ServiceProvider.GetRequiredService<CampaignStore>();
 
                 var campaign = await campaignStore.GetNextSendingCampaignAsync(stoppingToken).ConfigureAwait(false);
@@ -42,9 +55,9 @@ public class CampaignSenderService(
                     continue;
                 }
 
-                if (!sessionStore.TryGet(campaign.Id, out var session) || session is null)
+                if (!_sessionStore.TryGet(campaign.Id, out var session) || session is null)
                 {
-                    logger.LogWarning("Missing SMTP session for campaign {CampaignId}. Marking as failed.", campaign.Id);
+                    _logger.LogWarning("Missing SMTP session for campaign {CampaignId}. Marking as failed.", campaign.Id);
                     await campaignStore.MarkCampaignAsFailedAsync(campaign.Id, stoppingToken).ConfigureAwait(false);
                     continue;
                 }
@@ -62,7 +75,7 @@ public class CampaignSenderService(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Unexpected error in campaign sender loop.");
+                _logger.LogError(ex, "Unexpected error in campaign sender loop.");
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken).ConfigureAwait(false);
             }
         }
@@ -81,7 +94,7 @@ public class CampaignSenderService(
         if (pendingRecipients.Count == 0)
         {
             await campaignStore.FinalizeCampaignAsync(campaign.Id, cancellationToken).ConfigureAwait(false);
-            sessionStore.Remove(campaign.Id);
+            _sessionStore.Remove(campaign.Id);
             return true;
         }
 
@@ -99,13 +112,13 @@ public class CampaignSenderService(
 
             try
             {
-                await emailSender.SendAsync(campaign, recipient, session.Settings, cancellationToken).ConfigureAwait(false);
+                await _emailSender.SendAsync(campaign, recipient, session.Settings, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 log.Status = CampaignSendStatus.Failed;
                 log.ErrorMessage = TruncateError(ex.Message);
-                logger.LogError(ex, "Failed to send campaign {CampaignId} to {RecipientEmail}", campaign.Id, recipient.Email);
+                _logger.LogError(ex, "Failed to send campaign {CampaignId} to {RecipientEmail}", campaign.Id, recipient.Email);
             }
 
             logs.Add(log);

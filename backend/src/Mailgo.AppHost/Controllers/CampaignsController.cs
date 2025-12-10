@@ -17,24 +17,39 @@ namespace Mailgo.Api.Controllers;
 
 [ApiController]
 [Route("api/campaigns")]
-public class CampaignsController(
-    CampaignStore campaignStore,
-    ICampaignSendSessionStore sessionStore,
-    IEmailSender emailSender,
-    ISmtpPasswordDecryptor passwordDecryptor,
-    ILogger<CampaignsController> logger) : ControllerBase
+public class CampaignsController : ControllerBase
 {
+    private readonly CampaignStore _campaignStore;
+    private readonly ICampaignSendSessionStore _sessionStore;
+    private readonly IEmailSender _emailSender;
+    private readonly ISmtpPasswordDecryptor _passwordDecryptor;
+    private readonly ILogger<CampaignsController> _logger;
+
+    public CampaignsController(
+        CampaignStore campaignStore,
+        ICampaignSendSessionStore sessionStore,
+        IEmailSender emailSender,
+        ISmtpPasswordDecryptor passwordDecryptor,
+        ILogger<CampaignsController> logger)
+    {
+        _campaignStore = campaignStore;
+        _sessionStore = sessionStore;
+        _emailSender = emailSender;
+        _passwordDecryptor = passwordDecryptor;
+        _logger = logger;
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CampaignSummaryResponse>>> GetCampaigns(CancellationToken cancellationToken)
     {
-        var response = await campaignStore.GetSummariesAsync(cancellationToken).ConfigureAwait(false);
+        var response = await _campaignStore.GetSummariesAsync(cancellationToken).ConfigureAwait(false);
         return Ok(response);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<CampaignDetailResponse>> GetCampaign(Guid id, CancellationToken cancellationToken)
     {
-        var campaign = await campaignStore.GetDetailAsync(id, cancellationToken).ConfigureAwait(false);
+        var campaign = await _campaignStore.GetDetailAsync(id, cancellationToken).ConfigureAwait(false);
         if (campaign is null)
         {
             return NotFound();
@@ -46,7 +61,7 @@ public class CampaignsController(
     [HttpGet("{id:guid}/logs")]
     public async Task<ActionResult<IEnumerable<CampaignSendLogResponse>>> GetLogs(Guid id, CancellationToken cancellationToken)
     {
-        var logs = await campaignStore.GetLogsAsync(id, cancellationToken).ConfigureAwait(false);
+        var logs = await _campaignStore.GetLogsAsync(id, cancellationToken).ConfigureAwait(false);
         if (logs is null)
         {
             return NotFound();
@@ -60,7 +75,7 @@ public class CampaignsController(
         CampaignUpsertRequest request,
         CancellationToken cancellationToken)
     {
-        var createdCampaign = await campaignStore.CreateCampaignAsync(request, cancellationToken).ConfigureAwait(false);
+        var createdCampaign = await _campaignStore.CreateCampaignAsync(request, cancellationToken).ConfigureAwait(false);
         return CreatedAtAction(nameof(GetCampaign), new { id = createdCampaign.Id }, createdCampaign);
     }
 
@@ -70,7 +85,7 @@ public class CampaignsController(
         CampaignUpsertRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await campaignStore.UpdateCampaignAsync(id, request, cancellationToken).ConfigureAwait(false);
+        var result = await _campaignStore.UpdateCampaignAsync(id, request, cancellationToken).ConfigureAwait(false);
         if (result.NotFound)
         {
             return NotFound();
@@ -90,7 +105,7 @@ public class CampaignsController(
         SendTestRequest request,
         CancellationToken cancellationToken)
     {
-        var campaign = await campaignStore.GetCampaignAsync(id, cancellationToken).ConfigureAwait(false);
+        var campaign = await _campaignStore.GetCampaignAsync(id, cancellationToken).ConfigureAwait(false);
         if (campaign is null)
         {
             return NotFound();
@@ -107,20 +122,20 @@ public class CampaignsController(
 
         try
         {
-            var smtpSettings = await request.ToSettingsAsync(passwordDecryptor, cancellationToken).ConfigureAwait(false);
+            var smtpSettings = await request.ToSettingsAsync(_passwordDecryptor, cancellationToken).ConfigureAwait(false);
 
-            await emailSender.SendAsync(campaign, tempRecipient, smtpSettings, cancellationToken, request.TestEmail)
+            await _emailSender.SendAsync(campaign, tempRecipient, smtpSettings, cancellationToken, request.TestEmail)
                 .ConfigureAwait(false);
             return NoContent();
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogWarning(ex, "Invalid SMTP password payload for campaign {CampaignId}", campaign.Id);
+            _logger.LogWarning(ex, "Invalid SMTP password payload for campaign {CampaignId}", campaign.Id);
             return BadRequest("Invalid SMTP password payload.");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Test send failed for campaign {CampaignId}", campaign.Id);
+            _logger.LogError(ex, "Test send failed for campaign {CampaignId}", campaign.Id);
             return StatusCode(502, "SMTP send failed. Check credentials and try again.");
         }
     }
@@ -131,7 +146,7 @@ public class CampaignsController(
         SendNowRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await campaignStore.PrepareSendNowAsync(id, cancellationToken).ConfigureAwait(false);
+        var result = await _campaignStore.PrepareSendNowAsync(id, cancellationToken).ConfigureAwait(false);
         if (result.NotFound)
         {
             return NotFound();
@@ -145,16 +160,16 @@ public class CampaignsController(
         var campaign = result.Campaign!;
         try
         {
-            var smtpSettings = await request.ToSettingsAsync(passwordDecryptor, cancellationToken).ConfigureAwait(false);
-            sessionStore.Upsert(new CampaignSendSession(campaign.Id, smtpSettings, DateTime.UtcNow));
+            var smtpSettings = await request.ToSettingsAsync(_passwordDecryptor, cancellationToken).ConfigureAwait(false);
+            _sessionStore.Upsert(new CampaignSendSession(campaign.Id, smtpSettings, DateTime.UtcNow));
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogWarning(ex, "Invalid SMTP password payload for campaign {CampaignId}", campaign.Id);
+            _logger.LogWarning(ex, "Invalid SMTP password payload for campaign {CampaignId}", campaign.Id);
             return BadRequest("Invalid SMTP password payload.");
         }
 
-        logger.LogInformation(
+        _logger.LogInformation(
             "Campaign {CampaignId} queued for sending to {RecipientCount} recipients",
             campaign.Id,
             result.RecipientCount);

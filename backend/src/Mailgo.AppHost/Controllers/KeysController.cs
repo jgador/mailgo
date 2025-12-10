@@ -9,12 +9,19 @@ namespace Mailgo.Api.Controllers;
 
 [ApiController]
 [Route("api/keys")]
-public class KeysController(ISmtpPasswordDecryptor decryptor) : ControllerBase
+public class KeysController : ControllerBase
 {
+    private readonly ISmtpPasswordDecryptor _decryptor;
+
+    public KeysController(ISmtpPasswordDecryptor decryptor)
+    {
+        _decryptor = decryptor;
+    }
+
     [HttpGet("smtp")]
     public ActionResult<SmtpPublicKeyResponse> GetSmtpKey()
     {
-        var response = new SmtpPublicKeyResponse(decryptor.KeyId, decryptor.PublicKeyPem);
+        var response = new SmtpPublicKeyResponse(_decryptor.KeyId, _decryptor.PublicKeyPem);
         return Ok(response);
     }
 }

@@ -6,9 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Mailgo.Api.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : DbContext(options)
+public class ApplicationDbContext : DbContext
 {
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
+
     public DbSet<Recipient> Recipients => Set<Recipient>();
     public DbSet<Campaign> Campaigns => Set<Campaign>();
     public DbSet<CampaignSendLog> CampaignSendLogs => Set<CampaignSendLog>();
