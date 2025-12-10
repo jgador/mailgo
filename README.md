@@ -9,9 +9,9 @@ Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), 
 ## Table of Contents
 1. [Overview](#overview)
 2. [Downloads (Windows x64)](#downloads-windows-x64)
-3. [Docker Compose](#docker-compose)
-4. [Quick Start (web)](#quick-start-web)
-5. [Desktop (Electron)](#desktop-electron)
+3. [Desktop (Electron)](#desktop-electron)
+4. [Docker Compose](#docker-compose)
+5. [Quick Start (web)](#quick-start-web)
 6. [Docs](#docs)
 7. [Repository Layout](#repository-layout)
 
@@ -25,8 +25,12 @@ Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), 
 ## Downloads (Windows x64)
 - Fastest path: install the Windows x64 desktop build from `binaries/mailgo-<version>-win-x64.exe` (built/tested on Windows x64). After install, the app resources and local SQLite database live under `%LocalAppData%\Programs\mailgo` on Windows. Other platforms will follow as I can test them; PRs are welcome.
 
+## Desktop (Electron)
+- Location: `desktop/` (uses the same Create React App build and backend binaries).
+- For development, build, packaging, ports, and troubleshooting, see `docs/electron/README.md`.
+
 ## Docker Compose
-```bash
+```powershell
 cd infra
 docker compose up --build
 ```
@@ -36,7 +40,7 @@ docker compose up --build
 
 ## Quick Start (web)
 1. API
-   ```bash
+   ```powershell
    cd backend
    dotnet restore Mailgo.sln
    dotnet run --project src/Mailgo.AppHost/Mailgo.AppHost.csproj
@@ -44,31 +48,14 @@ docker compose up --build
    - Launch profile binds to `http://localhost:8080` (and `https://localhost:8443`) by default; override with `ASPNETCORE_URLS`.
    - SQLite defaults to `data/app.db` under the build output; set `ConnectionStrings__Default` to point elsewhere.
 2. Frontend
-   ```bash
+   ```powershell
    cd frontend/app
    npm install
-   REACT_APP_API_BASE_URL=http://localhost:8080/api npm start
+   $env:REACT_APP_API_BASE_URL = "http://localhost:8080/api"
+   npm start
    ```
    - Create React App dev server runs on `http://localhost:3000`.
    - Persist settings in `frontend/app/.env.local` (`REACT_APP_` prefix required).
-
-## Desktop (Electron)
-- Location: `desktop/` (uses the same Create React App build and backend binaries).
-- Prerequisites: Node 20+, .NET 10 SDK.
-- Dev (starts the Create React App dev server, backend `dotnet watch`, and Electron pointing at the dev server):
-  ```bash
-  cd desktop
-  npm install
-  npm run dev
-  ```
-- Build installer (bundles frontend build + published backend, outputs to `desktop/out/`):
-  ```bash
-  cd desktop
-  npm install
-  npm run build
-  ```
-  - Backend listens on `http://localhost:8080/api` inside the desktop app; SQLite lives in your OS user data folder.
-  - See `docs/electron/README.md` for structure, ports, and troubleshooting.
 
 ## Docs
 - Electron/Desktop guide: `docs/electron/README.md`
