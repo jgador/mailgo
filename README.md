@@ -7,13 +7,13 @@ Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), 
 </p>
 
 ## Table of Contents
-- [Overview](#overview)
-- [Downloads (Windows x64)](#downloads-windows-x64)
-- [Docker Compose](#docker-compose)
-- [Quick Start (web)](#quick-start-web)
-- [Desktop (Electron)](#desktop-electron)
-- [Docs](#docs)
-- [Repository Layout](#repository-layout)
+1. [Overview](#overview)
+2. [Downloads (Windows x64)](#downloads-windows-x64)
+3. [Docker Compose](#docker-compose)
+4. [Quick Start (web)](#quick-start-web)
+5. [Desktop (Electron)](#desktop-electron)
+6. [Docs](#docs)
+7. [Repository Layout](#repository-layout)
 
 ## Overview
 - Web UI built with Create React App + TypeScript; API built with ASP.NET Core + EF Core (SQLite).
