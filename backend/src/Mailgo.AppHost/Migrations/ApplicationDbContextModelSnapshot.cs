@@ -66,7 +66,7 @@ namespace Mailgo.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Campaigns");
+                    b.ToTable("Campaign");
                 });
 
             modelBuilder.Entity("Mailgo.Domain.Entities.CampaignSendLog", b =>
@@ -96,7 +96,7 @@ namespace Mailgo.Api.Migrations
 
                     b.HasIndex("CampaignId", "RecipientId");
 
-                    b.ToTable("CampaignSendLogs");
+                    b.ToTable("CampaignSendLog");
                 });
 
             modelBuilder.Entity("Mailgo.Domain.Entities.Recipient", b =>
@@ -126,7 +126,7 @@ namespace Mailgo.Api.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Recipients");
+                    b.ToTable("Recipient");
                 });
 
             modelBuilder.Entity("Mailgo.Domain.Entities.CampaignSendLog", b =>
