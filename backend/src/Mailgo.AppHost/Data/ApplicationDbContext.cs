@@ -22,14 +22,17 @@ public class ApplicationDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Recipient>()
+            .ToTable("Recipient")
             .HasIndex(r => r.Email)
             .IsUnique();
 
         modelBuilder.Entity<Campaign>()
+            .ToTable("Campaign")
             .Property(c => c.TargetRecipientCount)
             .HasDefaultValue(0);
 
         modelBuilder.Entity<CampaignSendLog>()
+            .ToTable("CampaignSendLog")
             .HasIndex(l => new { l.CampaignId, l.RecipientId });
     }
 }
