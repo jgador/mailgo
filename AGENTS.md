@@ -25,7 +25,7 @@ It has an optional Electron desktop wrapper that bundles the frontend build and 
 - infra
   - Compose file `infra/docker-compose.yml`; infra readme `infra/README.md`.
 - docs
-  - Docs root `docs`; Electron docs `docs/electron`.
+  - Docs root `docs`; desktop docs `desktop/README.md`.
 - data
   - SQLite files for dev/compose: `data/*.db` (persisted volume mount for compose).
 - scripts

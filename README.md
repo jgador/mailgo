@@ -61,7 +61,7 @@ If you prefer a persistent setting, create frontend app .env.local and set REACT
 
 The Electron desktop app bundles the web build and the backend into one installable app.
 
-- Desktop docs, see docs/electron/README.md
+- Desktop docs, see desktop/README.md
 - Desktop source, see desktop
 
 Typical flow on Windows.
@@ -114,7 +114,7 @@ Use recipient-sample.csv as the reference format for recipient imports.
 - Backend notes, backend/README.md
 - Frontend notes, frontend/app/README.md
 - Infra and compose notes, infra/README.md
-- Desktop packaging, docs/electron/README.md
+- Desktop packaging, desktop/README.md
 
 ## Repository layout
 
