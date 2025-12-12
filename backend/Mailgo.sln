@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailgo.AppHost", "src\\Mailgo.AppHost\\Mailgo.AppHost.csproj", "{07078B44-906E-42CE-BDB3-7C3EB63CAC37}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailgo.AppHost.Tests", "tests\\Mailgo.AppHost.Tests\\Mailgo.AppHost.Tests.csproj", "{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{07078B44-906E-42CE-BDB3-7C3EB63CAC37}.Release|x64.Build.0 = Release|Any CPU
 		{07078B44-906E-42CE-BDB3-7C3EB63CAC37}.Release|x86.ActiveCfg = Release|Any CPU
 		{07078B44-906E-42CE-BDB3-7C3EB63CAC37}.Release|x86.Build.0 = Release|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Debug|x64.Build.0 = Debug|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Debug|x86.Build.0 = Debug|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Release|x64.ActiveCfg = Release|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Release|x64.Build.0 = Release|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Release|x86.ActiveCfg = Release|Any CPU
+		{77C0AB1E-316E-42A2-B26A-C7CE2F35CABB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
