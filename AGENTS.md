@@ -1,7 +1,9 @@
 # AGENTS.md
 This file describes the released state of the master branch.
 It is meant to prevent full repo rescans.
-When you are not on master, also read AGENTS.delta.md.
+When you are not on master, also read `AGENTS.delta.md` in the repo root.
+- Agent helpers live at the root: `AGENTS.md`, `AGENTS.delta.md`.
+- The delta helper script is `scripts/agent_delta.ps1`.
 
 ## Product overview
 Mailgo is a local first email campaign manager.
@@ -9,39 +11,43 @@ It has an ASP.NET Core API using SQLite and EF Core.
 It has a React dashboard using Create React App and TypeScript.
 It has an optional Electron desktop wrapper that bundles the frontend build and the backend together.
 
-## Repo map
-- backend
-  - .NET solution, API and domain projects
-- frontend
-  - Create React App dashboard in frontend app
-- desktop
-  - Electron shell, packaging, and build scripts
+## Repo map (with key paths)
+- backend (dotnet)
+  - Solution `backend/Mailgo.sln`; main host project `backend/src/Mailgo.AppHost/Mailgo.AppHost.csproj`.
+  - API code under `backend/src/Mailgo.AppHost` (Controllers, Services, Requests, Responses, Migrations).
+  - Config: `backend/src/Mailgo.AppHost/appsettings*.json`.
+  - Tests live in `backend/tests`.
+- frontend (React)
+  - CRA app in `frontend/app`; entry point `frontend/app/src/index.tsx`.
+  - Env example `frontend/app/.env.example`; CRA config `frontend/app/tsconfig.json`.
+- desktop (Electron)
+  - Electron project root `desktop`; main dev entry `desktop/dev-main.js`; build config `desktop/electron-builder.yml`.
 - infra
-  - docker compose for local runs
+  - Compose file `infra/docker-compose.yml`; infra readme `infra/README.md`.
 - docs
-  - product docs, Electron docs
+  - Docs root `docs`; Electron docs `docs/electron`.
 - data
-  - local SQLite files for dev and compose runs
+  - SQLite files for dev/compose: `data/*.db` (persisted volume mount for compose).
 - scripts
-  - helper scripts
+  - Helper scripts, including `scripts/agent_delta.ps1` for delta generation.
 
 ## Common dev workflows
 Web dev
 - backend
-  - run the app host project from backend
+  - run from repo root: `dotnet run --project backend/src/Mailgo.AppHost/Mailgo.AppHost.csproj`
   - the default dev URL is localhost on port 8080 unless overridden by ASPNETCORE_URLS
 - frontend
-  - run npm start from frontend app
+  - from `frontend/app`: `npm start`
   - set REACT_APP_API_BASE_URL to point to the backend api base
 
 Docker compose
-- run docker compose from infra
+- from `infra`: `docker compose up`
 - web runs on localhost 3000 and proxies api
 - api runs on localhost 8080
 - sqlite data is persisted in the data folder
 
 Desktop dev
-- run npm run dev from desktop
+- from `desktop`: `npm run dev`
 - it starts the Create React App dev server
 - it starts dotnet watch for the backend
 - it starts Electron pointed at the dev server
