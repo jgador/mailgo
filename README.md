@@ -1,75 +1,132 @@
-# Mailgo - Local Email Campaign Tool
+# Mailgo
 
-Local-first email campaign manager with an ASP.NET Core API (SQLite + EF Core), a React dashboard, and an optional Electron desktop shell that bundles both.
+Local first email campaign tool, an ASP.NET Core API with SQLite, a Create React App web dashboard, and an optional Electron desktop app.
 
 <p align="center">
-  <img src="docs/media/mailgo-homepage.png" alt="Mailgo homepage dashboard" width="960">
+  <img src="docs/media/mailgo-homepage.png" alt="Mailgo dashboard" width="960">
 </p>
 
-## Table of Contents
-1. [Overview](#overview)
-2. [Downloads (Windows x64)](#downloads-windows-x64)
-3. [Desktop (Electron)](#desktop-electron)
-4. [Docker Compose](#docker-compose)
-5. [Quick Start (web)](#quick-start-web)
-6. [Docs](#docs)
-7. [Repository Layout](#repository-layout)
+## What you get
 
-## Overview
-- Web UI built with Create React App + TypeScript; API built with ASP.NET Core + EF Core (SQLite).
-- SMTP credentials are only provided at send time; nothing sensitive is persisted server-side.
-- Choose your runtime:
-  - Web/Docker: run the API and Create React App build behind Nginx.
-- Desktop: Electron wrapper that ships the Create React App build and backend together.
+- Import recipients from a CSV file.
+- Compose a campaign with rich text formatting.
+- Send a test email, then send the campaign to all recipients.
+- Run locally with Docker, or run in dev mode, or package as a desktop app.
+- Store data in a local SQLite database.
+- Keep SMTP credentials out of config files, credentials are provided at send time.
 
-## Downloads (Windows x64)
-- Fastest path: install the Windows x64 desktop build from `binaries/mailgo-<version>-win-x64.exe` (built/tested on Windows x64). After install, the app resources and local SQLite database live under `%LocalAppData%\Programs\mailgo` on Windows. Other platforms will follow as I can test them; PRs are welcome.
+## Fastest start with Docker
 
-## Desktop (Electron)
-- Location: `desktop/` (uses the same Create React App build and backend binaries).
-- For development, build, packaging, ports, and troubleshooting, see `docs/electron/README.md`.
+Prerequisites, Docker Desktop or Docker Engine with Docker Compose.
 
-## Docker Compose
-```powershell
+From the repo root.
+
+```bash
 cd infra
 docker compose up --build
 ```
-- `api` (ASP.NET Core) on `localhost:8080`
-- `web` (Create React App build served via Nginx) on `localhost:3000`, proxying `/api`
-- SQLite data persisted in `../data`
 
-## Quick Start (web)
-1. API
-   ```powershell
-   cd backend
-   dotnet restore Mailgo.sln
-   dotnet run --project src/Mailgo.AppHost/Mailgo.AppHost.csproj
-   ```
-   - Launch profile binds to `http://localhost:8080` (and `https://localhost:8443`) by default; override with `ASPNETCORE_URLS`.
-   - SQLite defaults to `data/app.db` under the build output; set `ConnectionStrings__Default` to point elsewhere.
-2. Frontend
-   ```powershell
-   cd frontend/app
-   npm install
-   $env:REACT_APP_API_BASE_URL = "http://localhost:8080/api"
-   npm start
-   ```
-   - Create React App dev server runs on `http://localhost:3000`.
-   - Persist settings in `frontend/app/.env.local` (`REACT_APP_` prefix required).
+Open the web UI at http://localhost:3000.
+
+The API is available at http://localhost:8080 and the API base path is http://localhost:8080/api.
+
+Data is stored under the repo data folder as a SQLite file, this folder is mounted into the api container.
+
+## Local development
+
+Prerequisites, .NET 10 SDK, Node.js 20 LTS.
+
+### Run the backend API
+
+```bash
+cd backend
+dotnet run --project src/Mailgo.AppHost/Mailgo.AppHost.csproj
+```
+
+Default API URL is http://localhost:8080.
+
+### Run the web dashboard
+
+```bash
+cd frontend/app
+npm install
+REACT_APP_API_BASE_URL=http://localhost:8080/api npm start
+```
+
+Dev server is http://localhost:3000.
+
+If you prefer a persistent setting, create frontend app .env.local and set REACT_APP_API_BASE_URL there.
+
+## Desktop app
+
+The Electron desktop app bundles the web build and the backend into one installable app.
+
+- Desktop docs, see docs/electron/README.md
+- Desktop source, see desktop
+
+Typical flow on Windows.
+
+```bash
+cd desktop
+npm install
+npm run build
+```
+
+## Configuration notes
+
+### Ports
+
+- API, 8080
+- Web, 3000
+
+For Docker, you can change ports in infra/docker-compose.yml.
+
+### SQLite
+
+For Docker, the default database path is mounted and set by ConnectionStrings__Default in infra/docker-compose.yml.
+
+For local dev, the backend uses its own configuration defaults, see backend configuration files under backend src.
+
+### SMTP credentials
+
+Mailgo is designed so SMTP credentials are not committed to the repo and are not stored in container environment variables.
+
+The UI sends SMTP credentials only when sending, and the backend handles them for the send operation.
+
+### Encryption keys for sensitive fields
+
+The backend exposes a public key used by the UI to encrypt sensitive values before sending them to the API.
+
+Set the private key securely in your runtime environment for non dev deployments, do not commit private keys to git.
+
+## Build outputs
+
+This repo uses Microsoft.DotNet.Arcade.Sdk to place build outputs under a shared artifacts folder in the repo root.
+
+Look under artifacts for build outputs from dotnet builds.
+
+## CSV format
+
+Use recipient-sample.csv as the reference format for recipient imports.
 
 ## Docs
-- Electron/Desktop guide: `docs/electron/README.md`
-- Backend notes: `backend/README.md`
-- Frontend notes: `frontend/app/README.md`
-- Infra/compose notes: `infra/README.md`
-- Media assets (screenshots/logos): `docs/media/`
 
-## Repository Layout
-- `backend/` - .NET solution (`Mailgo.sln`), API + domain projects, backend Dockerfile
-- `frontend/` - Create React App dashboard source (`app/`), frontend Dockerfile, UI tests
-- `desktop/` - Electron shell, build scripts, and packaging configuration
-- `infra/` - `docker-compose.yml` plus deployment-facing docs
-- `docs/` - desktop guide and shared media assets
-- `data/` - local SQLite files mounted into containers (gitignored)
-- `scripts/` - shared automation entry points (currently placeholder)
-- `recipient-sample.csv` - CSV format reference for recipient imports
+- Backend notes, backend/README.md
+- Frontend notes, frontend/app/README.md
+- Infra and compose notes, infra/README.md
+- Desktop packaging, docs/electron/README.md
+
+## Repository layout
+
+- backend, .NET solution and API services
+- frontend, Create React App dashboard
+- desktop, Electron shell and packaging scripts
+- infra, Docker Compose and deployment notes
+- docs, documentation and media assets
+- data, local SQLite files for Docker runs, gitignored
+- scripts, shared automation entry points
+- recipient-sample.csv, CSV format reference
+
+## License
+
+See LICENSE.

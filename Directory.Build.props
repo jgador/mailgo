@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.DotNet.Arcade.Sdk">
+  <PropertyGroup>
+    <!-- Place bin/obj under a shared artifacts folder for consistent build output -->
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts/</ArtifactsPath>
+    <!-- Provide a default version stamp so Arcade's versioning targets have stable inputs -->
+    <VersionPrefix Condition="'$(VersionPrefix)' == ''">1.0.0</VersionPrefix>
+    <PreReleaseVersionLabel Condition="'$(PreReleaseVersionLabel)' == ''">dev</PreReleaseVersionLabel>
+  </PropertyGroup>
+</Project>

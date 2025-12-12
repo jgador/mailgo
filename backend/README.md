@@ -1,40 +1,119 @@
-# Mailgo Backend
+# Backend
 
-ASP.NET Core + EF Core services live under `backend/`. The solution is `Mailgo.sln`, keeping API, domain model, workers, and test projects together.
+This folder contains the .NET backend for Mailgo.
 
-## Layout
+It is an ASP.NET Core API that stores data in SQLite and sends email campaigns via SMTP.
 
-- `src/Mailgo.AppHost` — HTTP API + background services (SQLite by default)
-- `src/Mailgo.AppHost/Domain` — shared entities, enums, DTOs
-- `tests/` — placeholder for future xUnit/BDD specs
-- `docker/` — container build assets (e.g., `api.Dockerfile`)
-- `scripts/` — automation hooks (`dotnet format`, seeding, etc.)
+## Prerequisites
 
-## Local Development
+- .NET 10 SDK
+- Optional, Docker
+
+## Quick start
+
+From the repo root.
 
 ```bash
 cd backend
-dotnet restore Mailgo.sln
 dotnet run --project src/Mailgo.AppHost/Mailgo.AppHost.csproj
 ```
 
-Set `ConnectionStrings__Default` to change the SQLite location (or point to another provider) and optionally override `ASPNETCORE_URLS`. SMTP information is never read from configuration—the API expects each send/test call to provide host/credential details.
+Default API URL is http://localhost:8080.
+API base path is http://localhost:8080/api.
 
-## Docker Build
+## Tests
 
-```bash
-cd backend
-docker build -f docker/api.Dockerfile -t mailgo-api .
-```
-
-The Dockerfile copies the entire solution so migrations stay in sync with the running container.
-
-## Entity Framework Migrations
-
-Run migrations from the backend root to keep relative paths intact:
+Run all tests.
 
 ```bash
 cd backend
-dotnet ef migrations add <Name> --project src/Mailgo.AppHost
-dotnet ef database update --project src/Mailgo.AppHost
+dotnet test Mailgo.sln
 ```
+
+Mailgo.AppHost.Tests contains integration tests for the API host.
+
+## Configuration
+
+Mailgo uses ASP.NET Core configuration, so values can come from appsettings, environment variables, and user secrets.
+
+### Ports
+
+If you need to override the URL.
+
+```bash
+ASPNETCORE_URLS=http://+:8080 dotnet run --project src/Mailgo.AppHost/Mailgo.AppHost.csproj
+```
+
+### SQLite
+
+The default connection string is.
+
+```
+Data Source=data/app.db
+```
+
+This path is relative to the backend working directory.
+
+Common options.
+
+- Create a backend data folder and let it use the default path
+- Override via environment variable
+
+Example override.
+
+```bash
+ConnectionStrings__Default="Data Source=../data/mailgo.db" dotnet run --project src/Mailgo.AppHost/Mailgo.AppHost.csproj
+```
+
+### SMTP credentials
+
+SMTP credentials are provided at send time and should not be committed to the repo.
+
+### Encryption keys for sensitive fields
+
+The backend exposes a public key for encrypting sensitive values in the client before they are sent to the API.
+
+Endpoint.
+
+- GET /api/keys/smtp
+
+Configuration keys.
+
+- EncryptionKeys__Smtp__KeyId
+- EncryptionKeys__Smtp__PublicKeyPem
+- EncryptionKeys__Smtp__PrivateKeyPem
+
+Do not commit private keys to git.
+For non dev deployments, inject the private key via environment variables, user secrets, or your secret store.
+
+## Migrations
+
+If you use EF Core migrations, ensure dotnet ef is installed.
+
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+Then run migrations commands from the backend folder as needed.
+
+## Docker note
+
+infra docker compose uses the backend published output.
+The docker/api.Dockerfile copies only what it needs to build and publish Mailgo.AppHost.
+
+If you add projects or files that the Docker build should include, update docker/api.Dockerfile accordingly.
+
+## Formatting
+
+From the repo root.
+
+```bash
+pwsh ./format.ps1
+```
+
+## Repository layout
+
+- src, application projects and API host
+- tests, test projects
+- docker, Dockerfile and container related files
+- scripts, build and utility scripts

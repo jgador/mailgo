@@ -1,14 +1,17 @@
-# Mailgo Frontend
+# Frontend
 
-The React dashboard now lives under `frontend/`. The CRA project stays in `app/` so UI, assets, and configuration are kept away from backend code.
+This folder contains the Mailgo web dashboard built with Create React App and TypeScript.
 
-## Layout
+It provides recipient import, campaign compose with formatting, and sending flows by calling the backend API.
 
-- `app/` — CRA source (TypeScript, React Router, component + asset tree)
-- `docker/web.Dockerfile` — multi-stage build that outputs an Nginx image
-- `tests/` — placeholder for future Vitest/Cypress suites
+## Prerequisites
 
-## Local Development
+- Node.js 20 LTS
+- npm
+
+## Quick start
+
+From the repo root.
 
 ```bash
 cd frontend/app
@@ -16,17 +19,77 @@ npm install
 REACT_APP_API_BASE_URL=http://localhost:8080/api npm start
 ```
 
-Persist env vars in `frontend/app/.env.local` (keys must stay prefixed with `REACT_APP_`).
+Open http://localhost:3000.
 
-### Sender Setup
+The backend API should be running at http://localhost:8080.
 
-Open the dashboard and navigate to **Settings → Sender Setup** to record your SMTP host, port, encryption preference, and from overrides. These values are stored only in your browser and are used to pre-populate the send/test modals; credentials such as passwords must still be supplied at send time.
+## Configuration
 
-## Production Build / Docker
+Create React App only exposes environment variables that start with REACT_APP_.
 
-```bash
-cd frontend
-docker build -f docker/web.Dockerfile -t mailgo-web .
+### API base url
+
+Set the API base url with REACT_APP_API_BASE_URL.
+
+Options.
+
+- One off for a command, set it inline when running npm start
+- Persistent for local dev, create a file named .env.local inside frontend/app
+
+Example .env.local.
+
+```
+REACT_APP_API_BASE_URL=http://localhost:8080/api
 ```
 
-`infra/docker-compose.yml` builds this image automatically and proxies `/api` to the backend container.
+If you change environment variables, restart npm start.
+
+## Available scripts
+
+From frontend/app.
+
+Start dev server.
+
+```bash
+npm start
+```
+
+Run tests.
+
+```bash
+npm test
+```
+
+Build production bundle.
+
+```bash
+npm run build
+```
+
+## Notes
+
+### Rich text formatting
+
+The toolbar actions should apply formatting in the composer and the preview should match what will be sent in the email.
+
+If you change the editor behavior, verify.
+
+- Subject and HTML body are correctly sent to the backend
+- Plain text fallback is generated or provided when applicable
+- Preview matches the final HTML body that is sent
+
+### SMTP credential encryption
+
+The UI fetches the SMTP public key from the backend and encrypts sensitive fields before posting them to the API.
+
+This uses the backend endpoint.
+
+- GET /api/keys/smtp
+
+If this call fails, sending may be blocked or fall back to an error state, depending on the current implementation.
+
+## Folder layout
+
+- src, application source
+- public, static assets
+- build, production output after npm run build
