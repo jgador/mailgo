@@ -256,6 +256,10 @@ ClientBin/
 *.publishsettings
 orleans.codegen.cs
 
+# Agent-generated summaries
+agent_history_summary.md
+AGENTS.delta.md
+
 # Including strong name files can present a security risk
 # (https://github.com/github/gitignore/pull/2483#issue-259490424)
 #*.snk
